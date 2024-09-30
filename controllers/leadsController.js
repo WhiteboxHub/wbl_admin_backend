@@ -92,3 +92,4 @@ const updateLead = (req, res) => {
 };
 
 module.exports = { getLeads, insertLead, updateLead };
+
