@@ -47,6 +47,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const leadsRoutes = require('./routes/leadsRoutes');
 const candidateRoutes = require('./routes/candidateRoutes')
+const batchRoutes = require('./routes/batchRoutes'); // Import the batchRoutes
 const mysql = require('mysql2');
 
 const app = express();
@@ -77,7 +78,9 @@ app.use((req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api', leadsRoutes);
-app.use('/api', candidateRoutes)
+app.use('/api', candidateRoutes);
+app.use('/api', batchRoutes); // Add the batchRoutes
+
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
