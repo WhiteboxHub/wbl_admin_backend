@@ -91,4 +91,41 @@ const updateLead = (req, res) => {
   });
 };
 
-module.exports = { getLeads, insertLead, updateLead };
+
+const deleteLead = (req, res) => {
+  const leadId = req.params.id;
+
+  // Ensure leadId is provided
+  if (!leadId) {
+    return res.status(400).json({ message: 'Lead ID is required' });
+  }
+
+  // Perform the delete operation
+  db.query('DELETE FROM leads WHERE leadid = ?', [leadId], (err, results) => {
+    if (err) {
+      console.error('Database delete error:', err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    // Check if any row was affected
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: 'Lead not found' });
+    }
+
+    // Respond with a success message
+    res.status(200).json({ message: 'Lead deleted successfully' });
+  });
+};
+
+
+module.exports = { getLeads, insertLead, updateLead, deleteLead };
+
+
+
+
+
+// module.exports = { getLeads, insertLead, updateLead };
+
+
+
+

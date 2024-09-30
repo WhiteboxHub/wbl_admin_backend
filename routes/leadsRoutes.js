@@ -360,6 +360,11 @@ router.put('/leads/update/:id', AdminValidationMiddleware, leadsController.updat
 
 // Route to insert a new lead using the leadsController
 router.put('/insert/leads', AdminValidationMiddleware, leadsController.insertLead);
+
+// Route to delete a batch
+router.delete('/leads/delete/:id', AdminValidationMiddleware, leadsController.deleteLead);
+
+
 // router.get("/leads/search/:keyword", AdminValidationMiddleware, (req, res) => {
 //   const searchKeyWord = req.params.keyword;
 
@@ -419,6 +424,7 @@ router.get("/leads/search", AdminValidationMiddleware, (req, res) => {
       });
     });
   });
+
 });
 
 module.exports = router;
