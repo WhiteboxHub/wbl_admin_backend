@@ -81,6 +81,9 @@ const deleteBatch = (req, res) => {
   });
 };
 
+module.exports = { getBatches, insertBatch, updateBatch,  deleteBatch };
+
+
 // // Route to search for batches by keyword
 // const searchBatches = (req, res) => {
 //   const searchKeyWord = req.params.keyword;
@@ -124,5 +127,3 @@ const deleteBatch = (req, res) => {
 
 
 // module.exports = { getBatches, insertBatch, updateBatch, deleteBatch, searchBatches };
-
-module.exports = { getBatches, insertBatch, updateBatch,  deleteBatch };
