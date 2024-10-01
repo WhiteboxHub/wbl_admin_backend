@@ -81,4 +81,48 @@ const deleteBatch = (req, res) => {
   });
 };
 
+// // Route to search for batches by keyword
+// const searchBatches = (req, res) => {
+//   const searchKeyWord = req.params.keyword;
+
+//   // Use parameterized queries to prevent SQL injection
+//   const getColumnsQuery = `
+//     SELECT * FROM batch
+//     WHERE 
+//       batchname LIKE ? OR 
+//       courseid LIKE ? OR 
+//       subject LIKE ? OR 
+//       instructor1 LIKE ? OR 
+//       instructor2 LIKE ? OR 
+//       instructor3 LIKE ? OR 
+//       topicscovered LIKE ? OR 
+//       topicsnotcovered LIKE ?
+//   `;
+
+//   // Prepare the parameters for the query
+//   const params = [
+//     `%${searchKeyWord}%`,
+//     `%${searchKeyWord}%`,
+//     `%${searchKeyWord}%`,
+//     `%${searchKeyWord}%`,
+//     `%${searchKeyWord}%`,
+//     `%${searchKeyWord}%`,
+//     `%${searchKeyWord}%`,
+//     `%${searchKeyWord}%`
+//   ];
+
+//   // Execute the query
+//   req.db.query(getColumnsQuery, params, (error, results) => {
+//     if (error) {
+//       console.error('Error executing query:', error.stack);
+//       return res.status(500).json({ error: 'An error occurred while fetching data.' });
+//     }
+
+//     res.json({ data: results });
+//   });
+// };
+
+
+// module.exports = { getBatches, insertBatch, updateBatch, deleteBatch, searchBatches };
+
 module.exports = { getBatches, insertBatch, updateBatch,  deleteBatch };
