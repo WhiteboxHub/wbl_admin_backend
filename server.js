@@ -76,10 +76,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/auth', authRoutes);
-app.use('/api', leadsRoutes);
-app.use('/api', candidateRoutes);
-app.use('/api', batchRoutes); // Add the batchRoutes
+app.use('/api/admin/auth', authRoutes);
+app.use('/api/admin', leadsRoutes);
+app.use('/api/admin', candidateRoutes);
+app.use('/api/admin', batchRoutes); // Add the batchRoutes
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
