@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 // const mysql = require('mysql2');
 
@@ -189,6 +190,8 @@
 
 
 
+=======
+>>>>>>> e4415fc9bd07429bf3d059a6af2fce469dae840a
 const mysql = require('mysql2');
 
 // Connect to the database
