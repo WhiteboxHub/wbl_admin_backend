@@ -48,7 +48,7 @@ const authRoutes = require('./routes/authRoutes');
 const leadsRoutes = require('./routes/leadsRoutes');
 const candidateRoutes = require('./routes/candidateRoutes')
 const batchRoutes = require('./routes/batchRoutes'); // Import the batchRoutes
-const candidateRoutes=require('./routes/candidateRoutes');
+
 const mysql = require('mysql2');
 
 const app = express();
