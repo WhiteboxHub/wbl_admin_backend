@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const candidateController = require('../controllers/candidateController'); // Adjust the path to candidateController
 const AdminValidationMiddleware = require('../Middleware/AdminValidationMiddleware');
 
 // Route to get candidates with pagination and search
@@ -21,8 +22,8 @@ router.get('/candidates', AdminValidationMiddleware, (req, res) => {
 
   // Add search functionality if a search query is provided
   if (searchQuery) {
-    query += ' WHERE name LIKE ? OR email LIKE ?'; // Adjust fields as necessary
-    countQuery += ' WHERE name LIKE ? OR email LIKE ?';
+    query += ' WHERE name LIKE ? OR id LIKE ?'; // Adjust fields as necessary
+    countQuery += ' WHERE name LIKE ? OR id LIKE ?';
     queryParams.push(`%${searchQuery}%`, `%${searchQuery}%`);
     countParams.push(`%${searchQuery}%`, `%${searchQuery}%`);
   }
@@ -42,7 +43,7 @@ router.get('/candidates', AdminValidationMiddleware, (req, res) => {
       if (countErr) {
         console.error('Count query error:', countErr);
         return res.status(500).json({ message: 'Database error' });
-      }
+     }
 
       const totalRows = countResults[0].total;
       res.json({ data: results, totalRows });
@@ -53,6 +54,7 @@ router.get('/candidates', AdminValidationMiddleware, (req, res) => {
 // Route to insert a new candidate
 router.post('/candidates/insert', (req, res) => {
   const newCandidate = req.body;
+  const authtoken = req.header('authToken');
 
   // Insert the new candidate
   req.db.query('INSERT INTO candidate SET ?', newCandidate, (err, results) => {
@@ -65,37 +67,53 @@ router.post('/candidates/insert', (req, res) => {
 });
 
 // Route to update an existing candidate
-router.put('/candidates/update/:id', AdminValidationMiddleware, (req, res) => {
-  const candidateId = req.params.id;
-  const updatedCandidate = req.body;
+router.put('/candidates/update/:id', AdminValidationMiddleware, candidateController.updateCandidate);
 
-  // Update the candidate
-  req.db.query('UPDATE candidate SET ? WHERE candidateid = ?', [updatedCandidate, candidateId], (err) => {
-    if (err) {
-      console.error('Database update error:', err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-    res.json({ message: 'Candidate updated successfully' });
-  });
-});
+// Route to insert a new candidate using the candidateController
+router.put('/insert/candidates', AdminValidationMiddleware, candidateController.insertCandidate);
 
-// Route to search candidates by keyword
-router.get('/candidates/search/:keyword', AdminValidationMiddleware, (req, res) => {
-  const searchKeyWord = req.params.keyword;
+// Route to delete a batch
+router.delete('/candidates/delete/:id', AdminValidationMiddleware, candidateController.deleteCandidate);
+
+// Modified backend route to handle global search with pagination
+router.get("/candidates/search", AdminValidationMiddleware, (req, res) => {
+  const searchQuery = req.query.search || ''; // Get search query from params
+  const page = parseInt(req.query.page, 10) || 1; // Default page = 1
+  const pageSize = parseInt(req.query.pageSize, 10) || 10; // Default pageSize = 10
+  const offset = (page - 1) * pageSize; // Calculate offset for pagination
 
   // Use parameterized queries to prevent SQL injection
-  const getColumnsQuery = `
-    SELECT * FROM candidate
-    WHERE CONCAT_WS(' ', name, email, phone) LIKE ?;`;
+  const getCandidatesQuery = `
+    SELECT * FROM whiteboxqa.candidate
+    WHERE CONCAT_WS(' ', name) LIKE ?
+    LIMIT ? OFFSET ?;`; // Apply LIMIT and OFFSET for pagination
 
-  // Execute the query
-  req.db.query(getColumnsQuery, [`%${searchKeyWord}%`], (error, results) => {
-    if (error) {
-      console.error('Error executing query:', error.stack);
+  const totalRowsQuery = `
+    SELECT COUNT(*) as totalRows FROM whiteboxqa.candidate
+    WHERE CONCAT_WS(' ', name) LIKE ?;`; // Query to get total rows for pagination
+
+  // Execute the query to get the total number of rows that match the search
+  req.db.query(totalRowsQuery, [`%${searchQuery}%`], (err, totalResults) => {
+    if (err) {
+      console.error('Error executing totalRowsQuery:', err.stack);
       return res.status(500).json({ error: 'An error occurred while fetching data.' });
     }
 
-    res.json(results);
+    const totalRows = totalResults[0].totalRows;
+
+    // Execute the query to get the candidates data based on pagination and search
+    req.db.query(getCandidatesQuery, [`%${searchQuery}%`, pageSize, offset], (error, results) => {
+      if (error) {
+        console.error('Error executing getCandidatesQuery:', error.stack);
+        return res.status(500).json({ error: 'An error occurred while fetching data.' });
+      }
+
+      // Return the data and totalRows to the frontend
+      res.json({
+        data: results,
+        totalRows,  // Send total rows for pagination purposes
+      });
+    });
   });
 });
 
