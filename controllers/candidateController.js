@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // const mysql = require('mysql2');
 
 // // Connect to the database
@@ -88,6 +89,8 @@
 
 
 
+=======
+>>>>>>> fd3232f655aff7036c6e3e316fdef59a6da1aa75
 const mysql = require('mysql2');
 
 // Connect to the database
@@ -98,6 +101,10 @@ const db = mysql.createConnection({
   database: process.env.DB_DATABASE
 });
 
+<<<<<<< HEAD
+=======
+// Get all candidates
+>>>>>>> fd3232f655aff7036c6e3e316fdef59a6da1aa75
 const getCandidates = (req, res) => {
   db.query('SELECT * FROM candidate', (err, results) => {
     if (err) {
@@ -108,6 +115,10 @@ const getCandidates = (req, res) => {
   });
 };
 
+<<<<<<< HEAD
+=======
+// Insert a new candidate
+>>>>>>> fd3232f655aff7036c6e3e316fdef59a6da1aa75
 const insertCandidate = (req, res) => {
   const newCandidate = req.body;
 
@@ -125,7 +136,11 @@ const insertCandidate = (req, res) => {
 const updateCandidate = (req, res) => {
   const candidateId = req.params.id;
   const updatedCandidate = req.body;
+<<<<<<< HEAD
   console.log('PUT request received for ID:', candidateId);
+=======
+
+>>>>>>> fd3232f655aff7036c6e3e316fdef59a6da1aa75
   // Ensure candidateId and updatedCandidate are present
   if (!candidateId || !updatedCandidate) {
     return res.status(400).json({ message: 'Candidate ID and data are required' });
@@ -141,6 +156,7 @@ const updateCandidate = (req, res) => {
   });
 };
 
+<<<<<<< HEAD
 const deleteCandidate = (req, res) => {
   const candidateId = req.params.id;
 
@@ -168,3 +184,6 @@ const deleteCandidate = (req, res) => {
 
 module.exports = { getCandidates, insertCandidate, updateCandidate, deleteCandidate };
 
+=======
+module.exports = { getCandidates, insertCandidate, updateCandidate };
+>>>>>>> fd3232f655aff7036c6e3e316fdef59a6da1aa75

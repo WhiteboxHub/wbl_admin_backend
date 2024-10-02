@@ -94,25 +94,67 @@ router.put('batches/insert', AdminValidationMiddleware, batchController.insertBa
 router.delete('/batches/delete/:id', AdminValidationMiddleware, batchController.deleteBatch);
 
 
-// Route to search for batches by keyword
-router.get("/batches/search/:keyword", AdminValidationMiddleware, (req, res) => {
-  const searchKeyWord = req.params.keyword;
+// // Route to search for batches by keyword
+// router.get("/batches/search/:keyword", AdminValidationMiddleware, (req, res) => {
+//   const searchKeyWord = req.params.keyword;
+
+//   // Use parameterized queries to prevent SQL injection
+  
+//   const getColumnsQuery = 
+//     `SELECT * FROM batch
+//     WHERE CONCAT_WS(' ', batchname, courseid) LIKE ?`;
+
+//   // Execute the query
+//   req.db.query(getColumnsQuery, [`%${searchKeyWord}%`], (error, results) => {
+//     if (error) {
+//       console.error('Error executing query:', error.stack);
+//       return res.status(500).json({ error: 'An error occurred while fetching data.' });
+//     }
+
+//     res.json(results);
+//   });
+// });
+
+router.get("/batches/search", AdminValidationMiddleware, (req, res) => {
+  const searchQuery = req.query.search || ''; // Get search query from params
+  const page = parseInt(req.query.page, 10) || 1; // Default page = 1
+  const pageSize = parseInt(req.query.pageSize, 10) || 10; // Default pageSize = 10
+  const offset = (page - 1) * pageSize; // Calculate offset for pagination
 
   // Use parameterized queries to prevent SQL injection
-  
-  const getColumnsQuery = 
-    `SELECT * FROM batch
-    WHERE CONCAT_WS(' ', batchname, courseid) LIKE ?`;
+  const getbatchQuery = `
+    SELECT * FROM whiteboxqa.batch
+    WHERE CONCAT_WS(' ', batchname) LIKE ? 
+    LIMIT ? OFFSET ?;`; // Apply LIMIT and OFFSET for pagination
 
-  // Execute the query
-  req.db.query(getColumnsQuery, [`%${searchKeyWord}%`], (error, results) => {
-    if (error) {
-      console.error('Error executing query:', error.stack);
+  const totalRowsQuery = `
+    SELECT COUNT(*) as totalRows FROM whiteboxqa.batch
+    WHERE CONCAT_WS(' ', batchname) LIKE ?;`; // Query to get total rows for pagination
+
+  // Execute the query to get the total number of rows that match the search
+  req.db.query(totalRowsQuery, [`%${searchQuery}%`], (err, totalResults) => {
+    if (err) {
+      console.error('Error executing totalRowsQuery:', err.stack);
       return res.status(500).json({ error: 'An error occurred while fetching data.' });
     }
 
-    res.json(results);
+    const totalRows = totalResults[0].totalRows;
+
+    // Execute the query to get the batch data based on pagination and search
+    req.db.query(getbatchQuery, [`%${searchQuery}%`, pageSize, offset], (error, results) => {
+      if (error) {
+        console.error('Error executing getbatchQuery:', error.stack);
+        return res.status(500).json({ error: 'An error occurred while fetching data.' });
+      }
+
+      // Return the data and totalRows to the frontend
+      res.json({
+        data: results,
+        totalRows,  // Send total rows for pagination purposes
+      });
+    });
   });
+
 });
 
 module.exports = router;

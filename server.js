@@ -46,6 +46,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const leadsRoutes = require('./routes/leadsRoutes');
+const candidateRoutes = require('./routes/candidateRoutes')
 const batchRoutes = require('./routes/batchRoutes'); // Import the batchRoutes
 const candidateRoutes=require('./routes/candidateRoutes');
 const mysql = require('mysql2');
@@ -78,6 +79,7 @@ app.use((req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api', leadsRoutes);
+app.use('/api', candidateRoutes);
 app.use('/api', batchRoutes); // Add the batchRoutes
 app.use('/api', candidateRoutes); 
 
