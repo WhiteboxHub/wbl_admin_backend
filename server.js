@@ -46,7 +46,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const leadsRoutes = require('./routes/leadsRoutes');
-// const candidateRoutes = require('./routes/candidateRoutes')
+const candidateRoutes = require('./routes/candidateRoutes')
 const batchRoutes = require('./routes/batchRoutes'); // Import the batchRoutes
 
 const mysql = require('mysql2');

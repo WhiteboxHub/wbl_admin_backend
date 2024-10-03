@@ -15,7 +15,7 @@ router.get('/batches', AdminValidationMiddleware, (req, res) => {
   const searchQuery = req.query.search || ''; // Search query
   const offset = (page - 1) * pageSize;
 
-  let query = 'SELECT * FROM batch ORDER BY orientationdate DESC'; // Replace 'createdAt' with your actual date column name
+  let query = 'SELECT * FROM batch ORDER BY batchid DESC'; // Replace 'createdAt' with your actual date column name
   let countQuery = 'SELECT COUNT(*) AS total FROM batch';
   const queryParams = [];
   const countParams = [];
