@@ -48,7 +48,7 @@ const authRoutes = require('./routes/authRoutes');
 const leadsRoutes = require('./routes/leadsRoutes');
 const candidateRoutes = require('./routes/candidateRoutes')
 const batchRoutes = require('./routes/batchRoutes'); // Import the batchRoutes
-
+const accessRoutes =require('./routes/accessRoutes');
 const mysql = require('mysql2');
 
 const app = express();
@@ -81,7 +81,7 @@ app.use('/api/admin/auth', authRoutes);
 app.use('/api/admin', leadsRoutes);
 app.use('/api/admin', candidateRoutes);
 app.use('/api/admin', batchRoutes); // Add the batchRoutes
-
+app.use('/api/admin',accessRoutes);
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
