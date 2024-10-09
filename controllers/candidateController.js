@@ -51,29 +51,34 @@ const updateCandidate = (req, res) => {
   });
 };
 
-const deleteCandidate = (req, res) => {
-  const candidateId = req.params.id;
 
-  // Ensure candidateId is provided
-  if (!candidateId) {
-    return res.status(400).json({ message: 'Candidate ID is required' });
+// Delete a batch
+const deleteCandidate = (req, res) => {
+  const batchId = req.params.name;
+
+  // Ensure batchId is provided
+  if (!batchId) {
+      return res.status(400).json({ message: 'Candidate ID is required' });
   }
 
   // Perform the delete operation
-  db.query('DELETE FROM candidate WHERE candidateid = ?', [candidateId], (err, results) => {
-    if (err) {
-      console.error('Database delete error:', err);
-      return res.status(500).json({ message: 'Database error' });
-    }
+  db.query('DELETE FROM candidate WHERE name = ?', [batchId], (err, results) => {
+      if (err) {
+          console.error('Database delete error:', err);
+          return res.status(500).json({ message: 'Database error' });
+      }
 
-    // Check if any row was affected
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ message: 'Candidate not found' });
-    }
+      // Check if any row was affected
+      if (results.affectedRows === 0) {
+          return res.status(404).json({ message: 'Candidate not found' });
+      }
 
-    // Respond with a success message
-    res.status(200).json({ message: 'Candidate deleted successfully' });
+      // Respond with a success message
+      res.status(200).json({ message: 'candidate deleted successfully' });
   });
 };
+
+
+
 
 module.exports = { getCandidates, insertCandidate, updateCandidate, deleteCandidate };
