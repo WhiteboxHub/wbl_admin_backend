@@ -16,7 +16,7 @@ router.get('/users', AdminValidationMiddleware, (req, res) => {
   const searchQuery = req.query.search || ''; // Search query
   const offset = (page - 1) * pageSize;
 
-  let query = 'SELECT * FROM authuser';
+  let query = 'SELECT * FROM authuser ORDER BY Registereddate DESC';
   let countQuery = 'SELECT COUNT(*) AS total FROM authuser';
   const queryParams = [];
   const countParams = [];

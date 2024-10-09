@@ -97,6 +97,34 @@ const db = mysql.createConnection({
   database: process.env.DB_DATABASE
 });
 
+
+
+
+
+
+
+
+// const getUsers = (req, res) => {
+//   const query = `
+//     SELECT authuser.*, leads.status 
+//     FROM authuser 
+//     LEFT JOIN leads 
+//     ON authuser.id = leads.user_id
+//   `;
+
+//   db.query(query, (err, results) => {
+//     if (err) {
+//       console.error('Database query error:', err);
+//       return res.status(500).json({ message: 'Database error' });
+//     }
+//     res.json(results);
+//     console.log(results)
+//   });
+// };
+
+
+
+
 const getUsers = (req, res) => {
   db.query('SELECT * FROM authuser', (err, results) => {
     if (err) {
