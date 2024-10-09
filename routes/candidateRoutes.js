@@ -70,7 +70,7 @@ router.post('/candidates/insert', (req, res) => {
 router.put('/candidates/update/:id', AdminValidationMiddleware, candidateController.updateCandidate);
 
 // Route to insert a new candidate using the candidateController
-router.put('/insert/candidates', AdminValidationMiddleware, candidateController.insertCandidate);
+router.post('/insert/candidates', AdminValidationMiddleware, candidateController.insertCandidate);
 
 // Route to delete a batch
 router.delete('/candidates/delete/:id', AdminValidationMiddleware, candidateController.deleteCandidate);
