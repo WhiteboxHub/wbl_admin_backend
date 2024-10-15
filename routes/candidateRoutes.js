@@ -70,10 +70,10 @@ router.post('/candidates/insert', (req, res) => {
 router.put('/candidates/update/:id', AdminValidationMiddleware, candidateController.updateCandidate);
 
 // Route to insert a new candidate using the candidateController
-router.post('/insert/candidates', AdminValidationMiddleware, candidateController.insertCandidate);
+router.put('/candidates/insert', AdminValidationMiddleware, candidateController.insertCandidate);
 
 // Route to delete a batch
-router.delete('/candidates/delete/:id', AdminValidationMiddleware, candidateController.deleteCandidate);
+router.delete('/candidates/delete/:name', AdminValidationMiddleware, candidateController.deleteCandidate);
 
 // Modified backend route to handle global search with pagination
 router.get("/candidates/search", AdminValidationMiddleware, (req, res) => {
