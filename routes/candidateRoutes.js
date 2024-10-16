@@ -15,7 +15,7 @@ router.get('/candidates', AdminValidationMiddleware, (req, res) => {
   const searchQuery = req.query.search || ''; // Search query
   const offset = (page - 1) * pageSize;
 
-  let query = 'SELECT * FROM candidate';
+  let query = 'SELECT * FROM candidate ORDER BY batchname DESC';
   let countQuery = 'SELECT COUNT(*) AS total FROM candidate';
   const queryParams = [];
   const countParams = [];
