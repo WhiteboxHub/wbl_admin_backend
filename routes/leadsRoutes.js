@@ -219,7 +219,7 @@ router.get("/leads/search", AdminValidationMiddleware, (req, res) => {
   const getLeadsQuery = `
 SELECT * FROM whiteboxqa.leads
 WHERE CONCAT_WS(' ', name) LIKE ? 
-ORDER BY startdate DESC
+ORDER BY leadid DESC
 LIMIT ? OFFSET ?;
 `; // Apply LIMIT and OFFSET for pagination
 
