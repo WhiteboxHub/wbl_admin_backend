@@ -16,7 +16,7 @@ router.get('/users', AdminValidationMiddleware, (req, res) => {
   const searchQuery = req.query.search || ''; // Search query
   const offset = (page - 1) * pageSize;
 
-  let query = 'SELECT * FROM authuser ORDER BY Registereddate DESC';
+  let query = 'SELECT * FROM authuser ORDER BY id DESC';
   let countQuery = 'SELECT COUNT(*) AS total FROM authuser';
   const queryParams = [];
   const countParams = [];
@@ -98,6 +98,7 @@ WHERE CONCAT(' ', uname) LIKE ?;
 const getUsersQuery = `
 SELECT * FROM authuser
 WHERE CONCAT(' ', uname) LIKE ?
+ ORDER BY id DESC
 LIMIT ? OFFSET ?;
 `;
   // Execute the query to get the total number of rows that match the search
