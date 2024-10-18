@@ -98,6 +98,7 @@ WHERE CONCAT(' ', uname) LIKE ?;
 const getUsersQuery = `
 SELECT * FROM authuser
 WHERE CONCAT(' ', uname) LIKE ?
+ ORDER BY id DESC
 LIMIT ? OFFSET ?;
 `;
   // Execute the query to get the total number of rows that match the search
