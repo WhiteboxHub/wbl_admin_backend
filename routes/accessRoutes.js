@@ -16,7 +16,7 @@ router.get('/users', AdminValidationMiddleware, (req, res) => {
   const searchQuery = req.query.search || ''; // Search query
   const offset = (page - 1) * pageSize;
 
-  let query = 'SELECT * FROM authuser ORDER BY Registereddate DESC';
+  let query = 'SELECT * FROM authuser ORDER BY id DESC';
   let countQuery = 'SELECT COUNT(*) AS total FROM authuser';
   const queryParams = [];
   const countParams = [];
@@ -53,7 +53,7 @@ router.get('/users', AdminValidationMiddleware, (req, res) => {
 });
 
 // Route to insert a new user
-router.post('/users', (req, res) => {
+router.post('/users/search', (req, res) => {
   const newUser = req.body;
 
   // Insert the new user
