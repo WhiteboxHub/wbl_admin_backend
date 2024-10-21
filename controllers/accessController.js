@@ -269,7 +269,9 @@ const updateUser = (req, res) => {
           console.error('Error fetching batch name:', err);
           return res.status(500).json({ message: 'Error fetching batch name' });
         }
-
+        //  ----------------------need to check with this----------------------------------
+         
+        // --------------------------------------------------------------------------------
         // If batch is found, use it, otherwise fallback to 'default'
         const batchname = batchRows.length > 0 ? batchRows[0].batchname : 'default';
 
@@ -279,7 +281,7 @@ const updateUser = (req, res) => {
             console.error('Database fetch error:', err);
             return res.status(500).json({ message: 'Error fetching user data' });
           }
-
+        // ------------------------------------------------------------------------------------
           const userData = rows[0];
 
           // Step 3: Transform authuser data to match the candidate table schema
