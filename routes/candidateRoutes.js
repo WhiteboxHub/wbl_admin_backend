@@ -15,7 +15,19 @@ router.get('/candidates', AdminValidationMiddleware, (req, res) => {
   const searchQuery = req.query.search || ''; // Search query
   const offset = (page - 1) * pageSize;
 
-  let query = 'SELECT * FROM candidate ORDER BY batchname DESC';
+  // let query = '
+  // SELECT * FROM candidate ORDER BY batchname DESC
+  // ';
+  let query=`
+ SELECT 
+      name, email, phone, course, batchname, enrolleddate, status, diceflag, 
+      education, workstatus, dob, portalid, agreement, driverslicense, 
+      workpermit, wpexpirationdate, offerletterurl, ssnvalidated, address, 
+      city, state, country, zip, emergcontactname, emergcontactemail, 
+      emergcontactphone, emergcontactaddrs, guidelines, term, referralid, 
+      salary0, salary6, salary12, originalresume, notes 
+    FROM candidate ORDER BY candidateid DESC 
+  `;
   let countQuery = 'SELECT COUNT(*) AS total FROM candidate';
   const queryParams = [];
   const countParams = [];
