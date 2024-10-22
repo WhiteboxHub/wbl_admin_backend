@@ -8,8 +8,28 @@ const db = mysql.createConnection({
   database: process.env.DB_DATABASE
 });
 
+const getCandidates = (req, res) => {
+  db.query('SELECT * FROM candidate', (err, results) => {
+    if (err) {
+      console.error('Database query error:', err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+    res.json(results);
+  });
+};
+
 // const getCandidates = (req, res) => {
-//   db.query('SELECT * FROM candidate', (err, results) => {
+//   const query = `
+//     SELECT 
+//       name, email, phone, course, batchname, enrolleddate, status, diceflag, 
+//       education, workstatus, dob, portalid, agreement, driverslicense, 
+//       workpermit, wpexpirationdate, offerletterurl, ssnvalidated, address, 
+//       city, state, country, zip, emergcontactname, emergcontactemail, 
+//       emergcontactphone, emergcontactaddrs, guidelines, term, referralid, 
+//       salary0, salary6, salary12, originalresume, notes 
+//     FROM candidate ORDER BY candidateid DESC
+//   `;
+//   db.query(query, (err, results) => {
 //     if (err) {
 //       console.error('Database query error:', err);
 //       return res.status(500).json({ message: 'Database error' });
@@ -18,15 +38,6 @@ const db = mysql.createConnection({
 //   });
 // };
 
-const getCandidates = (req, res) => {
-  db.query('SELECT * FROM candidate ORDER BY year DESC', (err, results) => {
-    if (err) {
-      console.error('Database query error:', err);
-      return res.status(500).json({ message: 'Database error' });
-    }
-    res.json(results);
-  });
-};
 
 const insertCandidate = (req, res) => {
   const newCandidate = req.body;

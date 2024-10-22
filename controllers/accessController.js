@@ -170,6 +170,80 @@ const insertUser = (req, res) => {
 // };
 
 // -*-*-------------new testing logic------------*----------*--
+// const updateUser = (req, res) => {
+//   const userId = req.params.id;
+//   const updatedUser = req.body;
+
+//   // Ensure userId and updatedUser are present
+//   if (!userId || !updatedUser) {
+//     return res.status(400).json({ message: 'User ID and data are required' });
+//   }
+
+//   // Step 1: Update the user in the authuser table
+//   db.query('UPDATE authuser SET ? WHERE id = ?', [updatedUser, userId], (err, results) => {
+//     if (err) {
+//       console.error('Database update error:', err);
+//       return res.status(500).json({ message: 'Database error' });
+//     }
+
+//     // Step 2: Check if the status is 'active' to insert data into the candidate table
+//     if (updatedUser.status === 'active') {
+//       // Fetch the data from the authuser table
+//       db.query('SELECT * FROM authuser WHERE id = ?', [userId], (err, rows) => {
+//         if (err) {
+//           console.error('Database fetch error:', err);
+//           return res.status(500).json({ message: 'Error fetching user data' });
+//         }
+
+//         const userData = rows[0];
+
+//         // Step 3: Transform authuser data to match the candidate table schema
+//         const candidateData = {
+//           name: userData.fullname || 'NA', // fullname in authuser -> name in candidate
+//           enrolleddate: userData.registereddate ? new Date(userData.registereddate).toISOString().split('T')[0] : 'NA', // format date
+//           email: userData.uname || 'NA', // uname to email
+//           phone: userData.phone || 'NA', // phone remains the same
+//           address: userData.address || 'NA', // address remains the same
+//           city: userData.city || 'NA', // city remains the same
+//           zip: userData.zip || 'NA', // zip remains the same
+//           state: userData.state || 'NA', // state remains the same
+//           country: userData.country || 'NA', // country remains the same
+//           status: userData.status || 'NA', // status remains the same
+//           // Optional: Default fields in the candidate table
+//           course: 'QA', // default course
+//           agreement: 'N', // default agreement
+//           promissory: 'N', // default promissory
+//           driverslicense: 'N', // default drivers license
+//           workpermit: 'N', // default work permit
+//           batchname: null, // default batchname
+//           processflag: 'N', // default process flag
+//           defaultprocessflag: 'N' // default process flag
+//         };
+
+//         // Step 4: Insert the transformed data into the candidate table
+//         db.query('INSERT INTO candidate SET ?', candidateData, (err, insertResults) => {
+//           if (err) {
+//             console.error('Error inserting into candidate table:', err);
+//             return res.status(500).json({ message: 'Error inserting into candidate table' });
+//           }
+
+//           // Successfully updated authuser and inserted into candidate
+//           res.status(200).json({
+//             message: 'User updated and inserted into candidate table',
+//             authuserId: userId,
+//             candidateId: insertResults.insertId
+//           });
+//         });
+//       });
+//     } else {
+//       // If status is not 'active', just return success for updating authuser
+//       res.status(200).json({ id: userId, ...updatedUser });
+//     }
+//   });
+// };
+
+
+// ---********---------------working logic ***************-------------------
 const updateUser = (req, res) => {
   const userId = req.params.id;
   const updatedUser = req.body;
@@ -188,53 +262,68 @@ const updateUser = (req, res) => {
 
     // Step 2: Check if the status is 'active' to insert data into the candidate table
     if (updatedUser.status === 'active') {
-      // Fetch the data from the authuser table
-      db.query('SELECT * FROM authuser WHERE id = ?', [userId], (err, rows) => {
+      
+      // Fetch the current batch from the batch table where current = 'Y' and subject = 'ML'
+      db.query('SELECT batchname FROM batch WHERE current = ? AND subject = ?', ['Y', 'ML'], (err, batchRows) => {
         if (err) {
-          console.error('Database fetch error:', err);
-          return res.status(500).json({ message: 'Error fetching user data' });
+          console.error('Error fetching batch name:', err);
+          return res.status(500).json({ message: 'Error fetching batch name' });
         }
+        //  ----------------------need to check with this----------------------------------
+         
+        // --------------------------------------------------------------------------------
+        // If batch is found, use it, otherwise fallback to 'default'
+        const batchname = batchRows.length > 0 ? batchRows[0].batchname : 'default';
 
-        const userData = rows[0];
-
-        // Step 3: Transform authuser data to match the candidate table schema
-        const candidateData = {
-          name: userData.fullname || 'NA', // fullname in authuser -> name in candidate
-          enrolleddate: userData.registereddate ? new Date(userData.registereddate).toISOString().split('T')[0] : 'NA', // format date
-          email: userData.uname || 'NA', // uname to email
-          phone: userData.phone || 'NA', // phone remains the same
-          address: userData.address || 'NA', // address remains the same
-          city: userData.city || 'NA', // city remains the same
-          zip: userData.zip || 'NA', // zip remains the same
-          state: userData.state || 'NA', // state remains the same
-          country: userData.country || 'NA', // country remains the same
-          status: userData.status || 'NA', // status remains the same
-          // Optional: Default fields in the candidate table
-          course: 'QA', // default course
-          agreement: 'N', // default agreement
-          promissory: 'N', // default promissory
-          driverslicense: 'N', // default drivers license
-          workpermit: 'N', // default work permit
-          batchname: null, // default batchname
-          processflag: 'N', // default process flag
-          defaultprocessflag: 'N' // default process flag
-        };
-
-        // Step 4: Insert the transformed data into the candidate table
-        db.query('INSERT INTO candidate SET ?', candidateData, (err, insertResults) => {
+        // Fetch the user data from the authuser table
+        db.query('SELECT * FROM authuser WHERE id = ?', [userId], (err, rows) => {
           if (err) {
-            console.error('Error inserting into candidate table:', err);
-            return res.status(500).json({ message: 'Error inserting into candidate table' });
+            console.error('Database fetch error:', err);
+            return res.status(500).json({ message: 'Error fetching user data' });
           }
+        // ------------------------------------------------------------------------------------
+          const userData = rows[0];
 
-          // Successfully updated authuser and inserted into candidate
-          res.status(200).json({
-            message: 'User updated and inserted into candidate table',
-            authuserId: userId,
-            candidateId: insertResults.insertId
+          // Step 3: Transform authuser data to match the candidate table schema
+          const candidateData = {
+            name: userData.fullname || 'NA', // fullname in authuser -> name in candidate
+            enrolleddate: userData.registereddate ? new Date(userData.registereddate).toISOString().split('T')[0] : 'NA', // format date
+            email: userData.uname || 'NA', // uname to email
+            phone: userData.phone || 'NA', // phone remains the same
+            address: userData.address || 'NA', // address remains the same
+            city: userData.city || 'NA', // city remains the same
+            zip: userData.zip || 'NA', // zip remains the same
+            state: userData.state || 'NA', // state remains the same
+            country: userData.country || 'NA', // country remains the same
+            status: userData.status || 'NA', // status remains the same
+            // Optional: Default fields in the candidate table
+            course: 'ML', // default course set to 'ML'
+            agreement: 'N', // default agreement
+            promissory: 'N', // default promissory
+            driverslicense: 'N', // default drivers license
+            workpermit: 'N', // default work permit
+            batchname: batchname, // Use the batchname fetched from batch table
+            processflag: 'N', // default process flag
+            defaultprocessflag: 'N' // default process flag
+          };
+
+          // Step 4: Insert the transformed data into the candidate table
+          db.query('INSERT INTO candidate SET ?', candidateData, (err, insertResults) => {
+            if (err) {
+              console.error('Error inserting into candidate table:', err);
+              return res.status(500).json({ message: 'Error inserting into candidate table' });
+            }
+
+            // Successfully updated authuser and inserted into candidate
+            res.status(200).json({
+              message: 'User updated and inserted into candidate table',
+              authuserId: userId,
+              candidateId: insertResults.insertId
+            });
           });
         });
       });
+      
     } else {
       // If status is not 'active', just return success for updating authuser
       res.status(200).json({ id: userId, ...updatedUser });
@@ -242,7 +331,7 @@ const updateUser = (req, res) => {
   });
 };
 
-
+// ------------------------------------------------------------------------------------------
 
 const deleteUser = (req, res) => {
   const userId = req.params.id;
