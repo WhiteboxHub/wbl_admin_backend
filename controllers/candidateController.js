@@ -8,8 +8,19 @@ const db = mysql.createConnection({
   database: process.env.DB_DATABASE
 });
 
+
 const getCandidates = (req, res) => {
-  db.query('SELECT * FROM candidate', (err, results) => {
+  const query = `
+    SELECT 
+      name, email, phone, course, batchname, enrolleddate, status, diceflag, 
+      education, workstatus, dob, portalid, agreement, driverslicense, 
+      workpermit, wpexpirationdate, offerletterurl, ssnvalidated, address, 
+      city, state, country, zip, emergcontactname, emergcontactemail, 
+      emergcontactphone, emergcontactaddrs, guidelines, term, referralid, 
+      salary0, salary6, salary12, originalresume, notes 
+    FROM candidate ORDER BY candidateid DESC
+  `;
+  db.query(query, (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -17,26 +28,6 @@ const getCandidates = (req, res) => {
     res.json(results);
   });
 };
-
-// const getCandidates = (req, res) => {
-//   const query = `
-//     SELECT 
-//       name, email, phone, course, batchname, enrolleddate, status, diceflag, 
-//       education, workstatus, dob, portalid, agreement, driverslicense, 
-//       workpermit, wpexpirationdate, offerletterurl, ssnvalidated, address, 
-//       city, state, country, zip, emergcontactname, emergcontactemail, 
-//       emergcontactphone, emergcontactaddrs, guidelines, term, referralid, 
-//       salary0, salary6, salary12, originalresume, notes 
-//     FROM candidate ORDER BY candidateid DESC
-//   `;
-//   db.query(query, (err, results) => {
-//     if (err) {
-//       console.error('Database query error:', err);
-//       return res.status(500).json({ message: 'Database error' });
-//     }
-//     res.json(results);
-//   });
-// };
 
 
 const insertCandidate = (req, res) => {
@@ -51,7 +42,7 @@ const insertCandidate = (req, res) => {
     res.status(201).json({ id: results.insertId, ...newCandidate });
   });
 };
-
+// // -----------------------------------**********************------------------
 // Update a candidate
 const updateCandidate = (req, res) => {
   const candidateId = req.params.id;
@@ -71,8 +62,8 @@ const updateCandidate = (req, res) => {
     res.status(200).json({ candidateid: candidateId, ...updatedCandidate });
   });
 };
-
-
+// // Update a candidate
+// -----------------**************************-------------------
 // Delete a batch
 const deleteCandidate = (req, res) => {
   const batchId = req.params.name;
@@ -102,4 +93,4 @@ const deleteCandidate = (req, res) => {
 
 
 
-module.exports = { getCandidates, insertCandidate, updateCandidate, deleteCandidate };
+module.exports = { getCandidates, insertCandidate, deleteCandidate , updateCandidate};

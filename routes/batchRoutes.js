@@ -94,26 +94,7 @@ router.put('batches/insert', AdminValidationMiddleware, batchController.insertBa
 router.delete('/batches/delete/:id', AdminValidationMiddleware, batchController.deleteBatch);
 
 
-// // Route to search for batches by keyword
-// router.get("/batches/search/:keyword", AdminValidationMiddleware, (req, res) => {
-//   const searchKeyWord = req.params.keyword;
 
-//   // Use parameterized queries to prevent SQL injection
-  
-//   const getColumnsQuery = 
-//     `SELECT * FROM batch
-//     WHERE CONCAT_WS(' ', batchname, courseid) LIKE ?`;
-
-//   // Execute the query
-//   req.db.query(getColumnsQuery, [`%${searchKeyWord}%`], (error, results) => {
-//     if (error) {
-//       console.error('Error executing query:', error.stack);
-//       return res.status(500).json({ error: 'An error occurred while fetching data.' });
-//     }
-
-//     res.json(results);
-//   });
-// });
 
 router.get("/batches/search", AdminValidationMiddleware, (req, res) => {
   const searchQuery = req.query.search || ''; // Get search query from params

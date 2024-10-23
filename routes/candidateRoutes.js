@@ -20,7 +20,7 @@ router.get('/candidates', AdminValidationMiddleware, (req, res) => {
   // ';
   let query=`
  SELECT 
-      name, email, phone, course, batchname, enrolleddate, status, diceflag, 
+      candidateid,name, email, phone, course, batchname, enrolleddate, status, diceflag, 
       education, workstatus, dob, portalid, agreement, driverslicense, 
       workpermit, wpexpirationdate, offerletterurl, ssnvalidated, address, 
       city, state, country, zip, emergcontactname, emergcontactemail, 
@@ -31,7 +31,7 @@ router.get('/candidates', AdminValidationMiddleware, (req, res) => {
   let countQuery = 'SELECT COUNT(*) AS total FROM candidate';
   const queryParams = [];
   const countParams = [];
-
+                     
   // Add search functionality if a search query is provided
   if (searchQuery) {
     query += ' WHERE name LIKE ? OR id LIKE ?'; // Adjust fields as necessary
