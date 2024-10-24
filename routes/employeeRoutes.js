@@ -3,6 +3,39 @@ const router = express.Router();
 const employeeController = require("../controllers/employeeController"); // Adjust the path to employeeController
 const AdminValidationMiddleware = require("../Middleware/AdminValidationMiddleware");
 
+// Route to get the users for the dropdown (excluding certain permission IDs)
+router.get("/employees/users", AdminValidationMiddleware, (req, res) => {
+  const db = req.db;
+
+  if (!db) {
+    return res.status(500).json({ message: "Database connection error" });
+  }
+
+  // Define the query to fetch users excluding permission IDs 13 and 14
+  const query = `
+    SELECT '' as id, '' as name
+    UNION 
+    SELECT DISTINCT u.id as id, CONCAT(u.display_name, '-', u.email) as name 
+    FROM uc_users u
+    JOIN uc_user_permission_matches up ON u.id = up.user_id
+    WHERE up.permission_id NOT IN (13, 14)
+    ORDER BY name;
+  `;
+
+  // Execute the query
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error executing the user query:", err);
+      return res.status(500).json({ error: "An error occurred while fetching users." });
+    }
+
+    // Send the results back to the client
+    res.json(results);
+  });
+});
+
+// Other existing routes...
+
 // Route to get employees with pagination and search
 router.get("/employees", AdminValidationMiddleware, (req, res) => {
   const db = req.db;
@@ -15,7 +48,10 @@ router.get("/employees", AdminValidationMiddleware, (req, res) => {
   const searchQuery = req.query.search || ""; // Search query
   const offset = (page - 1) * pageSize;
 
-  let query = 'SELECT * FROM employee ';
+  let query = `SELECT id, name, email, phone, status, startdate, mgrid, designationid, 
+personalemail, personalphone, dob, address, city, state, country, zip, skypeid, 
+salary, commission, commissionrate, type, empagreementurl, offerletterurl, dlurl, 
+workpermiturl, contracturl, enddate, loginid, responsibilities, notes FROM employee ORDER BY startdate DESC `;
   let countQuery = 'SELECT COUNT(*) AS total FROM employee';
   const queryParams = [];
   const countParams = [];
