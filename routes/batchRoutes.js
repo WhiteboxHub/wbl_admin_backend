@@ -51,6 +51,35 @@ router.get('/batches', AdminValidationMiddleware, (req, res) => {
   });
 });
 
+// -----------------------Manisai Added--------------------------------
+
+// -------------------------------------------------------------------
+// New route to get batch names sorted by date
+router.get('/batchnames', AdminValidationMiddleware, (req, res) => {
+  const db = req.db;
+  if (!db) {
+    return res.status(500).json({ message: 'Database connection error' });
+  }
+
+  const query = `
+    SELECT batchname 
+    FROM batch 
+    ORDER BY STR_TO_DATE(CONCAT(SUBSTRING_INDEX(batchname, "-", 1), "-01"), "%Y-%m-%d") DESC
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Database query error:', err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    const batchNames = results.map(result => result.batchname);
+    res.json({ batchNames });
+  });
+});
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
 router.get('/batches', AdminValidationMiddleware, (req, res) => {
     const db = req.db;
     if (!db) {
