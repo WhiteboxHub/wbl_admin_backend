@@ -9,22 +9,21 @@ const pool = require('../db')
 // });
 
 const getEmployees = (req, res) => {
-<<<<<<< HEAD
   db.query(` SELECT id, name, email, phone, status, startdate, mgrid, designationid, 
 personalemail, personalphone, dob, address, city, state, country, zip, skypeid, 
 salary, commission, commissionrate, type, empagreementurl, offerletterurl, dlurl, 
 workpermiturl, contracturl, enddate, loginid, responsibilities, notes FROM employee ORDER BY startdate DESC `, 
     (err, results) => {
-=======
+
   pool.query('SELECT * FROM employee', (err, results) => {
->>>>>>> 55fe00da4941cdc9e99359f13ccc0c2ce8bc86fe
+
     if (err) {
       console.error('Database query error:', err);
       return res.status(500).json({ message: 'Database error' });
     }
     res.json(results);
   });
-};
+})};
 
 const insertEmployee = (req, res) => {
   const newEmployee = req.body;
