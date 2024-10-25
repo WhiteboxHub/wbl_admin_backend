@@ -1,19 +1,23 @@
 const mysql = require('mysql2');
-
-// Connect to the database
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE
-});
+const pool = require('../db')
+// // Connect to the database
+// const db = mysql.createConnection({
+//   host: process.env.DB_HOST,
+//   user: process.env.DB_USER,
+//   password: process.env.DB_PASSWORD,
+//   database: process.env.DB_DATABASE
+// });
 
 const getEmployees = (req, res) => {
+<<<<<<< HEAD
   db.query(` SELECT id, name, email, phone, status, startdate, mgrid, designationid, 
 personalemail, personalphone, dob, address, city, state, country, zip, skypeid, 
 salary, commission, commissionrate, type, empagreementurl, offerletterurl, dlurl, 
 workpermiturl, contracturl, enddate, loginid, responsibilities, notes FROM employee ORDER BY startdate DESC `, 
     (err, results) => {
+=======
+  pool.query('SELECT * FROM employee', (err, results) => {
+>>>>>>> 55fe00da4941cdc9e99359f13ccc0c2ce8bc86fe
     if (err) {
       console.error('Database query error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -26,7 +30,7 @@ const insertEmployee = (req, res) => {
   const newEmployee = req.body;
 
   // Make sure to sanitize and validate input data as necessary
-  db.query('INSERT INTO employee SET ?', newEmployee, (err, results) => {
+  pool.query('INSERT INTO employee SET ?', newEmployee, (err, results) => {
     if (err) {
       console.error('Database insert error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -46,7 +50,7 @@ const updateEmployee = (req, res) => {
   }
 
   // Update the employee
-  db.query('UPDATE employee SET ? WHERE id = ?', [updatedEmployee, employeeId], (err, results) => {
+  pool.query('UPDATE employee SET ? WHERE id = ?', [updatedEmployee, employeeId], (err, results) => {
     if (err) {
       console.error('Database update error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -64,7 +68,7 @@ const deleteEmployee = (req, res) => {
   }
 
   // Perform the delete operation
-  db.query('DELETE FROM employee WHERE id = ?', [employeeId], (err, results) => {
+  pool.query('DELETE FROM employee WHERE id = ?', [employeeId], (err, results) => {
     if (err) {
       console.error('Database delete error:', err);
       return res.status(500).json({ message: 'Database error' });
