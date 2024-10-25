@@ -9,7 +9,14 @@ const hashPassword = (password) => {
 
 const login = (req, res) => {
   const { username, password } = req.body;
-  const db = req.db;
+  // ----old connection------------
+  // const db = req.db;
+
+  // ---------------------------
+
+  const db = req.db
+  // console.log(db);
+  
 
   // Query to check user credentials from the 'authuser' table
   db.query('SELECT * FROM whiteboxqa.authuser WHERE uname = ?', [username], (err, results) => {

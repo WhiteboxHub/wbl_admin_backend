@@ -1,15 +1,15 @@
 const mysql = require('mysql2');
-
-// Connect to the database
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE
-});
+const pool = require('../db')
+// // Connect to the database
+// const db = mysql.createConnection({
+//   host: process.env.DB_HOST,
+//   user: process.env.DB_USER,
+//   password: process.env.DB_PASSWORD,
+//   database: process.env.DB_DATABASE
+// });
 
 const getEmployees = (req, res) => {
-  db.query('SELECT * FROM employee', (err, results) => {
+  pool.query('SELECT * FROM employee', (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -22,7 +22,7 @@ const insertEmployee = (req, res) => {
   const newEmployee = req.body;
 
   // Make sure to sanitize and validate input data as necessary
-  db.query('INSERT INTO employee SET ?', newEmployee, (err, results) => {
+  pool.query('INSERT INTO employee SET ?', newEmployee, (err, results) => {
     if (err) {
       console.error('Database insert error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -42,7 +42,7 @@ const updateEmployee = (req, res) => {
   }
 
   // Update the employee
-  db.query('UPDATE employee SET ? WHERE id = ?', [updatedEmployee, employeeId], (err, results) => {
+  pool.query('UPDATE employee SET ? WHERE id = ?', [updatedEmployee, employeeId], (err, results) => {
     if (err) {
       console.error('Database update error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -60,7 +60,7 @@ const deleteEmployee = (req, res) => {
   }
 
   // Perform the delete operation
-  db.query('DELETE FROM employee WHERE id = ?', [employeeId], (err, results) => {
+  pool.query('DELETE FROM employee WHERE id = ?', [employeeId], (err, results) => {
     if (err) {
       console.error('Database delete error:', err);
       return res.status(500).json({ message: 'Database error' });

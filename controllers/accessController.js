@@ -88,14 +88,14 @@
 
 
 const mysql = require('mysql2');
-
+const pool = require('../db')
 // Connect to the database
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE
-});
+// const db = mysql.createConnection({
+//   host: process.env.DB_HOST,
+//   user: process.env.DB_USER,
+//   password: process.env.DB_PASSWORD,
+//   database: process.env.DB_DATABASE
+// });
 
 
 
@@ -126,7 +126,7 @@ const db = mysql.createConnection({
 
 
 const getUsers = (req, res) => {
-  db.query('SELECT * FROM authuser', (err, results) => {
+  pool.query('SELECT * FROM authuser', (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -140,7 +140,7 @@ const insertUser = (req, res) => {
   const newUser = req.body;
 
   // Make sure to sanitize and validate input data as necessary
-  db.query('INSERT INTO authuser SET ?', newUser, (err, results) => {
+  pool.query('INSERT INTO authuser SET ?', newUser, (err, results) => {
     if (err) {
       console.error('Database insert error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -254,7 +254,7 @@ const updateUser = (req, res) => {
   }
 
   // Step 1: Update the user in the authuser table
-  db.query('UPDATE authuser SET ? WHERE id = ?', [updatedUser, userId], (err, results) => {
+  pool.query('UPDATE authuser SET ? WHERE id = ?', [updatedUser, userId], (err, results) => {
     if (err) {
       console.error('Database update error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -264,7 +264,7 @@ const updateUser = (req, res) => {
     if (updatedUser.status === 'active') {
       
       // Fetch the current batch from the batch table where current = 'Y' and subject = 'ML'
-      db.query('SELECT batchname FROM batch WHERE current = ? AND subject = ?', ['Y', 'ML'], (err, batchRows) => {
+      pool.query('SELECT batchname FROM batch WHERE current = ? AND subject = ?', ['Y', 'ML'], (err, batchRows) => {
         if (err) {
           console.error('Error fetching batch name:', err);
           return res.status(500).json({ message: 'Error fetching batch name' });
@@ -276,7 +276,7 @@ const updateUser = (req, res) => {
         const batchname = batchRows.length > 0 ? batchRows[0].batchname : 'default';
 
         // Fetch the user data from the authuser table
-        db.query('SELECT * FROM authuser WHERE id = ?', [userId], (err, rows) => {
+        pool.query('SELECT * FROM authuser WHERE id = ?', [userId], (err, rows) => {
           if (err) {
             console.error('Database fetch error:', err);
             return res.status(500).json({ message: 'Error fetching user data' });
@@ -308,7 +308,7 @@ const updateUser = (req, res) => {
           };
 
           // Step 4: Insert the transformed data into the candidate table
-          db.query('INSERT INTO candidate SET ?', candidateData, (err, insertResults) => {
+          pool.query('INSERT INTO candidate SET ?', candidateData, (err, insertResults) => {
             if (err) {
               console.error('Error inserting into candidate table:', err);
               return res.status(500).json({ message: 'Error inserting into candidate table' });
@@ -342,7 +342,7 @@ const deleteUser = (req, res) => {
   }
 
   // Perform the delete operation
-  db.query('DELETE FROM authuser WHERE id = ?', [userId], (err, results) => {
+  pool.query('DELETE FROM authuser WHERE id = ?', [userId], (err, results) => {
     if (err) {
       console.error('Database delete error:', err);
       return res.status(500).json({ message: 'Database error' });
