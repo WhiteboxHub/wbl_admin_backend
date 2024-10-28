@@ -21,10 +21,12 @@ const getBatches = (req, res) => {
 
 // Insert a new batch
 const insertBatch = (req, res) => {
+
+  const db = req.db;
   const newBatch = req.body;
 
   // Make sure to sanitize and validate input data as necessary
-  pool.query('INSERT INTO batch SET ?', newBatch, (err, results) => {
+  db.query('INSERT INTO batch SET ?', newBatch, (err, results) => {
     if (err) {
       console.error('Database insert error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -36,6 +38,7 @@ const insertBatch = (req, res) => {
 // Update a batch
 const updateBatch = (req, res) => {
   const batchId = req.params.id;
+  const db = req.db;
   const updatedBatch = req.body;
   console.log('PUT request received for ID:', batchId);
 
@@ -45,7 +48,7 @@ const updateBatch = (req, res) => {
   }
 
   // Update the batch
-  pool.query('UPDATE batch SET ? WHERE batchid = ?', [updatedBatch, batchId], (err, results) => {
+  db.query('UPDATE batch SET ? WHERE batchid = ?', [updatedBatch, batchId], (err, results) => {
     if (err) {
       console.error('Database update error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -58,6 +61,7 @@ const updateBatch = (req, res) => {
 // Delete a batch
 const deleteBatch = (req, res) => {
   const batchId = req.params.id;
+  const db = req.db;
 
   // Ensure batchId is provided
   if (!batchId) {
@@ -65,7 +69,7 @@ const deleteBatch = (req, res) => {
   }
 
   // Perform the delete operation
-  pool.query('DELETE FROM batch WHERE batchid = ?', [batchId], (err, results) => {
+  db.query('DELETE FROM batch WHERE batchid = ?', [batchId], (err, results) => {
       if (err) {
           console.error('Database delete error:', err);
           return res.status(500).json({ message: 'Database error' });
