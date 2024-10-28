@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const AdminValidationMiddleware = require('../middleware/AdminValidationMiddleware');
+const AdminValidationMiddleware = require('../Middleware/AdminValidationMiddleware');
 const bypoController = require('../controllers/bypoController');
 
 // Get all POs by purchase order number

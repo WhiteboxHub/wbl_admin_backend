@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const AdminValidationMiddleware = require('../middleware/AdminValidationMiddleware'); // Import your middleware
+const AdminValidationMiddleware = require('../Middleware/AdminValidationMiddleware');// Import your middleware
 const placementController = require('../controllers/placementController'); // Ensure this path is correct
 
 // Get all POs

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const candidateController = require('../controllers/candidateController'); // Adjust the path to candidateController
-const AdminValidationMiddleware = require('../middleware/AdminValidationMiddleware');
+const AdminValidationMiddleware = require('../Middleware/AdminValidationMiddleware');
 
 // Route to get candidates with pagination and search
 router.get('/candidates', AdminValidationMiddleware, (req, res) => {

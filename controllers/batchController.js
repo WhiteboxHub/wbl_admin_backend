@@ -1,12 +1,6 @@
 const mysql = require('mysql2');
 const pool = require('../db')
-// Connect to the database
-// const db = mysql.createConnection({
-//   host: process.env.DB_HOST,
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASSWORD,
-//   database: process.env.DB_DATABASE
-// });
+
 
 // Get all batches
 const getBatches = (req, res) => {
@@ -21,10 +15,11 @@ const getBatches = (req, res) => {
 
 // Insert a new batch
 const insertBatch = (req, res) => {
+  const db=req.db;
   const newBatch = req.body;
 
   // Make sure to sanitize and validate input data as necessary
-  pool.query('INSERT INTO batch SET ?', newBatch, (err, results) => {
+  db.query('INSERT INTO batch SET ?', newBatch, (err, results) => {
     if (err) {
       console.error('Database insert error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -126,4 +121,4 @@ module.exports = { getBatches, insertBatch, updateBatch,  deleteBatch };
 // };
 
 
-// module.exports = { getBatches, insertBatch, updateBatch, deleteBatch, searchBatches };
+//module.exports = { getBatches, insertBatch, updateBatch, deleteBatch, searchBatches };
