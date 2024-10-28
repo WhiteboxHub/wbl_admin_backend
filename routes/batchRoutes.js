@@ -51,7 +51,36 @@ router.get('', AdminValidationMiddleware, (req, res) => {
   });
 });
 
-router.get('/', AdminValidationMiddleware, (req, res) => {
+// -----------------------Manisai Added--------------------------------
+
+// -------------------------------------------------------------------
+// New route to get batch names sorted by date
+router.get('/batchnames', AdminValidationMiddleware, (req, res) => {
+  const db = req.db;
+  if (!db) {
+    return res.status(500).json({ message: 'Database connection error' });
+  }
+
+  const query = `
+    SELECT batchname 
+    FROM batch 
+    ORDER BY STR_TO_DATE(CONCAT(SUBSTRING_INDEX(batchname, "-", 1), "-01"), "%Y-%m-%d") DESC
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Database query error:', err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    const batchNames = results.map(result => result.batchname);
+    res.json({ batchNames });
+  });
+});
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+router.get('/batches', AdminValidationMiddleware, (req, res) => {
     const db = req.db;
     if (!db) {
       return res.status(500).json({ message: 'Database connection error' });
@@ -96,7 +125,7 @@ router.delete('/delete/:id', AdminValidationMiddleware, batchController.deleteBa
 
 
 
-router.get("/search", AdminValidationMiddleware, (req, res) => {
+router.get("/batches/search", AdminValidationMiddleware, (req, res) => {
   const searchQuery = req.query.search || ''; // Get search query from params
   const page = parseInt(req.query.page, 10) || 1; // Default page = 1
   const pageSize = parseInt(req.query.pageSize, 10) || 10; // Default pageSize = 10

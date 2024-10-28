@@ -1,16 +1,16 @@
 const mysql = require('mysql2');
-
+const pool = require('../db')
 // Connect to the database
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE
-});
+// const db = mysql.createConnection({
+//   host: process.env.DB_HOST,
+//   user: process.env.DB_USER,
+//   password: process.env.DB_PASSWORD,
+//   database: process.env.DB_DATABASE
+// });
 
 // Get all batches
 const getBatches = (req, res) => {
-  db.query('SELECT * FROM batch', (err, results) => {
+  pool.query('SELECT * FROM batch', (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -24,7 +24,7 @@ const insertBatch = (req, res) => {
   const newBatch = req.body;
 
   // Make sure to sanitize and validate input data as necessary
-  db.query('INSERT INTO batch SET ?', newBatch, (err, results) => {
+  pool.query('INSERT INTO batch SET ?', newBatch, (err, results) => {
     if (err) {
       console.error('Database insert error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -45,7 +45,7 @@ const updateBatch = (req, res) => {
   }
 
   // Update the batch
-  db.query('UPDATE batch SET ? WHERE batchid = ?', [updatedBatch, batchId], (err, results) => {
+  pool.query('UPDATE batch SET ? WHERE batchid = ?', [updatedBatch, batchId], (err, results) => {
     if (err) {
       console.error('Database update error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -65,7 +65,7 @@ const deleteBatch = (req, res) => {
   }
 
   // Perform the delete operation
-  db.query('DELETE FROM batch WHERE batchid = ?', [batchId], (err, results) => {
+  pool.query('DELETE FROM batch WHERE batchid = ?', [batchId], (err, results) => {
       if (err) {
           console.error('Database delete error:', err);
           return res.status(500).json({ message: 'Database error' });

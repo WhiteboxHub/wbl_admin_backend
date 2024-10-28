@@ -38,18 +38,18 @@
 
 
 
-const mysql = require('mysql2');
-
+// const mysql = require('mysql2');
+const pool = require('../db')
 // Connect to the database
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE
-});
+// const db = mysql.createConnection({
+//   host: process.env.DB_HOST,
+//   user: process.env.DB_USER,
+//   password: process.env.DB_PASSWORD,
+//   database: process.env.DB_DATABASE
+// });
 
 const getLeads = (req, res) => {
-  db.query('SELECT * FROM leads', (err, results) => {
+  pool.query('SELECT * FROM leads', (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -62,7 +62,7 @@ const insertLead = (req, res) => {
   const newLead = req.body;
 
   // Make sure to sanitize and validate input data as necessary
-  db.query('INSERT INTO leads SET ?', newLead, (err, results) => {
+  pool.query('INSERT INTO leads SET ?', newLead, (err, results) => {
     if (err) {
       console.error('Database insert error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -82,7 +82,7 @@ const updateLead = (req, res) => {
   }
 
   // Update the lead
-  db.query('UPDATE leads SET ? WHERE leadid = ?', [updatedLead, leadId], (err, results) => {
+  pool.query('UPDATE leads SET ? WHERE leadid = ?', [updatedLead, leadId], (err, results) => {
     if (err) {
       console.error('Database update error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -101,7 +101,7 @@ const deleteLead = (req, res) => {
   }
 
   // Perform the delete operation
-  db.query('DELETE FROM leads WHERE leadid = ?', [leadId], (err, results) => {
+  pool.query('DELETE FROM leads WHERE leadid = ?', [leadId], (err, results) => {
     if (err) {
       console.error('Database delete error:', err);
       return res.status(500).json({ message: 'Database error' });

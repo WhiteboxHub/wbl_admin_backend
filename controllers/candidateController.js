@@ -1,15 +1,26 @@
 const mysql = require('mysql2');
+const pool = require('../db')
+// // Connect to the database
+// const db = mysql.createConnection({
+//   host: process.env.DB_HOST,
+//   user: process.env.DB_USER,
+//   password: process.env.DB_PASSWORD,
+//   database: process.env.DB_DATABASE
+// });
 
-// Connect to the database
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE
-});
 
 const getCandidates = (req, res) => {
-  db.query('SELECT * FROM candidate', (err, results) => {
+  const query = `
+    SELECT 
+      name, email, phone, course, batchname, enrolleddate, status, diceflag, 
+      education, workstatus, dob, portalid, agreement, driverslicense, 
+      workpermit, wpexpirationdate, offerletterurl, ssnvalidated, address, 
+      city, state, country, zip, emergcontactname, emergcontactemail, 
+      emergcontactphone, emergcontactaddrs, guidelines, term, referralid, 
+      salary0, salary6, salary12, originalresume, notes 
+    FROM candidate ORDER BY candidateid DESC
+  `;
+  pool.query(query, (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -18,32 +29,12 @@ const getCandidates = (req, res) => {
   });
 };
 
-// const getCandidates = (req, res) => {
-//   const query = `
-//     SELECT 
-//       name, email, phone, course, batchname, enrolleddate, status, diceflag, 
-//       education, workstatus, dob, portalid, agreement, driverslicense, 
-//       workpermit, wpexpirationdate, offerletterurl, ssnvalidated, address, 
-//       city, state, country, zip, emergcontactname, emergcontactemail, 
-//       emergcontactphone, emergcontactaddrs, guidelines, term, referralid, 
-//       salary0, salary6, salary12, originalresume, notes 
-//     FROM candidate ORDER BY candidateid DESC
-//   `;
-//   db.query(query, (err, results) => {
-//     if (err) {
-//       console.error('Database query error:', err);
-//       return res.status(500).json({ message: 'Database error' });
-//     }
-//     res.json(results);
-//   });
-// };
-
 
 const insertCandidate = (req, res) => {
   const newCandidate = req.body;
 
   // Make sure to sanitize and validate input data as necessary
-  db.query('INSERT INTO candidate SET ?', newCandidate, (err, results) => {
+  pool.query('INSERT INTO candidate SET ?', newCandidate, (err, results) => {
     if (err) {
       console.error('Database insert error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -51,7 +42,7 @@ const insertCandidate = (req, res) => {
     res.status(201).json({ id: results.insertId, ...newCandidate });
   });
 };
-
+// // -----------------------------------**********************------------------
 // Update a candidate
 const updateCandidate = (req, res) => {
   const candidateId = req.params.id;
@@ -64,7 +55,7 @@ const updateCandidate = (req, res) => {
   }
 
   // Update the candidate
-  db.query('UPDATE candidate SET ? WHERE candidateid = ?', [updatedCandidate, candidateId], (err, results) => {
+  pool.query('UPDATE candidate SET ? WHERE candidateid = ?', [updatedCandidate, candidateId], (err, results) => {
     if (err) {
       console.error('Database update error:', err);
       return res.status(500).json({ message: 'Database error' });
@@ -98,9 +89,8 @@ const updateCandidate = (req, res) => {
     }
   });
 };
-
-
-
+// // Update a candidate
+// -----------------**************************-------------------
 // Delete a batch
 const deleteCandidate = (req, res) => {
   const batchId = req.params.name;
@@ -111,7 +101,7 @@ const deleteCandidate = (req, res) => {
   }
 
   // Perform the delete operation
-  db.query('DELETE FROM candidate WHERE name = ?', [batchId], (err, results) => {
+  pool.query('DELETE FROM candidate WHERE name = ?', [batchId], (err, results) => {
       if (err) {
           console.error('Database delete error:', err);
           return res.status(500).json({ message: 'Database error' });
@@ -130,4 +120,4 @@ const deleteCandidate = (req, res) => {
 
 
 
-module.exports = { getCandidates, insertCandidate, updateCandidate, deleteCandidate };
+module.exports = { getCandidates, insertCandidate, deleteCandidate , updateCandidate};

@@ -6,7 +6,7 @@ const AdminValidationMiddleware = require('../Middleware/AdminValidationMiddlewa
 // Route to get users with pagination and search
 router.get('/users', AdminValidationMiddleware, (req, res) => {
   const db = req.db;
-  console.log(db);
+  // console.log(db);
   
   if (!db) {  
     return res.status(500).json({ message: 'Database connection error' });
