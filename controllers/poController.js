@@ -10,36 +10,36 @@ const db = mysql.createPool({
   database: process.env.DB_DATABASE,
 });
 
-// Get all POs
-// Get all POs
 exports.getPOs = async (req, res) => {
   try {
-    const [results] = await db.query(`SELECT 
-        po.id AS "PO ID",
-        pl.id AS "Placement ID",
-        po.begindate AS "Start Date",
-        po.enddate AS "End Date",
-        po.rate AS "Rate",
-        po.overtimerate AS "Overtime Rate",
-        po.freqtype AS "Freq. Type",
-        po.frequency AS "Invoice Frequency",
-        po.invoicestartdate AS "Invoice Start Date",
-        po.invoicenet AS "Invoice Net",
-        po.polink AS "PO Url",
-        po.notes AS "Notes",
-        CONCAT(c.name, '---', v.companyname, '---', cl.companyname) AS "Placement Details"
-      FROM 
+    const [results] = await db.query(`
+      SELECT
+        po.id AS POID,
+        CONCAT(c.name, '---', v.companyname, '---', cl.companyname) AS PlacementDetails,
+        po.begindate AS StartDate,
+        po.enddate AS EndDate,
+        po.rate AS Rate,
+        po.overtimerate AS OvertimeRate,
+        po.freqtype AS FreqType,
+        po.frequency AS InvoiceFrequency,
+        po.invoicestartdate AS InvoiceStartDate,
+        po.invoicenet AS InvoiceNet,
+        po.polink AS POUrl,
+        po.notes AS Notes
+      FROM
         po
-      LEFT JOIN 
+      LEFT JOIN
         placement pl ON po.placementid = pl.id
-      LEFT JOIN 
+      LEFT JOIN
         candidate c ON pl.candidateid = c.candidateid
-      LEFT JOIN 
+      LEFT JOIN
         vendor v ON pl.vendorid = v.id
-      LEFT JOIN 
+      LEFT JOIN
         client cl ON pl.clientid = cl.id
-      ORDER BY 
-        po.id DESC;  -- Order by PO ID in descending order`); // Using async/await
+      ORDER BY
+        po.id DESC;
+    `); // Using async/await
+
     res.json({
       data: results,
       totalRows: results.length, // Total count of rows returned
@@ -147,53 +147,33 @@ exports.addPO = async (req, res) => {
 exports.updatePO = async (req, res) => {
   try {
     const { id } = req.params;
-    const {
-      placementid,
-      begindate,
-      enddate,
-      rate,
-      overtimerate,
-      freqtype,
-      frequency,
-      invoicestartdate,
-      invoicenet,
-      polink,
-      notes,
-    } = req.body;
+    const updateFields = {};
 
-    // Validate required fields
-    if (!placementid || !id) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
+    // Extract fields from request body and add them to updateFields object
+    if (req.body.begindate !== undefined) updateFields.begindate = req.body.begindate;
+    if (req.body.enddate !== undefined) updateFields.enddate = req.body.enddate;
+    if (req.body.rate !== undefined) updateFields.rate = req.body.rate;
+    if (req.body.overtimerate !== undefined) updateFields.overtimerate = req.body.overtimerate;
+    if (req.body.freqtype !== undefined) updateFields.freqtype = req.body.freqtype;
+    if (req.body.frequency !== undefined) updateFields.frequency = req.body.frequency;
+    if (req.body.invoicestartdate !== undefined) updateFields.invoicestartdate = req.body.invoicestartdate;
+    if (req.body.invoicenet !== undefined) updateFields.invoicenet = req.body.invoicenet;
+    if (req.body.polink !== undefined) updateFields.polink = req.body.polink;
+    if (req.body.notes !== undefined) updateFields.notes = req.body.notes;
+
+    // Create an array of field names and values for the SQL query
+    const fieldNames = Object.keys(updateFields);
+    const fieldValues = Object.values(updateFields);
+
+    // Generate the SET clause for the SQL query
+    const setClause = fieldNames.map(field => `${field} = ?`).join(", ");
+
+    // Add the id to the end of fieldValues array for the WHERE clause
+    fieldValues.push(id);
 
     const result = await db.query(
-      `UPDATE po SET
-        placementid = ?,
-        begindate = ?,
-        enddate = ?,
-        rate = ?,
-        overtimerate = ?,
-        freqtype = ?,
-        frequency = ?,
-        invoicestartdate = ?,
-        invoicenet = ?,
-        polink = ?,
-        notes = ?
-      WHERE id = ?`,
-      [
-        placementid,
-        begindate,
-        enddate,
-        rate,
-        overtimerate,
-        freqtype,
-        frequency,
-        invoicestartdate,
-        invoicenet,
-        polink,
-        notes,
-        id,
-      ]
+      `UPDATE po SET ${setClause} WHERE id = ?`,
+      fieldValues
     );
 
     if (result[0].affectedRows === 0) {
@@ -202,20 +182,7 @@ exports.updatePO = async (req, res) => {
 
     res.json({
       message: "PO updated",
-      data: {
-        id,
-        placementid,
-        begindate,
-        enddate,
-        rate,
-        overtimerate,
-        freqtype,
-        frequency,
-        invoicestartdate,
-        invoicenet,
-        polink,
-        notes,
-      },
+      data: updateFields,
     });
   } catch (error) {
     console.error("Error updating PO:", error);

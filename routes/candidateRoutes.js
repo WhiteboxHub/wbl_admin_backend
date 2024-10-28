@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const candidateController = require('../controllers/candidateController'); // Adjust the path to candidateController
-const AdminValidationMiddleware = require('../Middleware/AdminValidationMiddleware');
+const AdminValidationMiddleware = require('../middleware/AdminValidationMiddleware');
 
 // Route to get candidates with pagination and search
 router.get('/candidates', AdminValidationMiddleware, (req, res) => {
@@ -20,7 +20,7 @@ router.get('/candidates', AdminValidationMiddleware, (req, res) => {
   // ';
   let query=`
  SELECT 
-      name, email, phone, course, batchname, enrolleddate, status, diceflag, 
+     candidateid, name, email, phone, course, batchname, enrolleddate, status, diceflag, 
       education, workstatus, dob, portalid, agreement, driverslicense, 
       workpermit, wpexpirationdate, offerletterurl, ssnvalidated, address, 
       city, state, country, zip, emergcontactname, emergcontactemail, 
@@ -84,7 +84,6 @@ router.put('/candidates/update/:id', AdminValidationMiddleware, candidateControl
 // Route to insert a new candidate using the candidateController
 router.put('/candidates/insert', AdminValidationMiddleware, candidateController.insertCandidate);
 
-// Route to delete a batch
 router.delete('/candidates/delete/:name', AdminValidationMiddleware, candidateController.deleteCandidate);
 
 // Modified backend route to handle global search with pagination
