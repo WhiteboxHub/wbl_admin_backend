@@ -48,6 +48,7 @@ const updateCandidate = (req, res) => {
   const candidateId = req.params.id;
   const updatedCandidate = req.body;
   console.log('PUT request received for ID:', candidateId);
+
   // Ensure candidateId and updatedCandidate are present
   if (!candidateId || !updatedCandidate) {
     return res.status(400).json({ message: 'Candidate ID and data are required' });
@@ -59,7 +60,33 @@ const updateCandidate = (req, res) => {
       console.error('Database update error:', err);
       return res.status(500).json({ message: 'Database error' });
     }
-    res.status(200).json({ candidateid: candidateId, ...updatedCandidate });
+
+    // Check if the status field has been changed to "placed"
+    if (updatedCandidate.status && updatedCandidate.status.toLowerCase() === 'placed') {
+      const placementData = {
+        candidateid: candidateId,
+        placementDate: new Date(), // or use a specific date if needed
+        // Add any other relevant fields for the placement table
+      };
+
+      // Insert into the placement table
+      db.query('INSERT INTO placement SET ?', placementData, (placementErr, placementResults) => {
+        if (placementErr) {
+          console.error('Error inserting into placement table:', placementErr);
+          return res.status(500).json({ message: 'Error inserting into placement table' });
+        }
+
+        // Respond with success for both updates
+        return res.status(200).json({ 
+          candidateid: candidateId, 
+          ...updatedCandidate,
+          placement: placementResults.insertId // return placement details if needed
+        });
+      });
+    } else {
+      // If status is not "placed", just return the candidate update response
+      res.status(200).json({ candidateid: candidateId, ...updatedCandidate });
+    }
   });
 };
 // // Update a candidate
