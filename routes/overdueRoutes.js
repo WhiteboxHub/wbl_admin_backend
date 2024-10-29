@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const overdueController = require('../controllers/overdueController');
-const AdminValidationMiddleware = require('../middleware/AdminValidationMiddleware');
+const AdminValidationMiddleware = require('../Middleware/AdminValidationMiddleware');
 
 router.get('/overdue', AdminValidationMiddleware, overdueController.getOverduePOs);
 
