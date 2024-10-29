@@ -1,8 +1,236 @@
 const db = require("../db");
 
+// // Get all overdue POs
+// exports.getOverduePOs = (req, res) => {
+//   console.log("GET request received to fetch all overdue POs");
+
+//   // Query to retrieve all overdue POs with the specified fields
+//   const query = `
+//     SELECT
+//     i.id AS pkid, 
+//     (SELECT concat(c.name, ' - ', v.companyname, ' - ', cl.companyname)
+//      FROM candidate c
+//      JOIN placement p ON c.candidateid = p.candidateid
+//      JOIN po o ON o.placementid = p.id
+//      JOIN vendor v ON p.vendorid = v.id
+//      JOIN client cl ON p.clientid = cl.id
+//      WHERE o.id = i.poid) AS poid,
+//     i.invoicenumber,
+//     i.invoicedate,
+//     i.quantity,
+//     p.rate,
+//     DATE_ADD(i.invoicedate, INTERVAL p.invoicenet DAY) AS expecteddate,
+//     ((i.quantity * p.rate) + (i.otquantity * p.overtimerate)) AS amountexpected,
+//     i.startdate,
+//     i.enddate,
+//     i.status,
+//     i.remindertype,
+//     i.amountreceived,
+//     i.receiveddate,
+//     i.releaseddate,
+//     i.checknumber,
+//     i.invoiceurl,
+//     i.checkurl,
+//     v.companyname,
+//     v.fax AS vendorfax,
+//     v.phone AS vendorphone,
+//     v.email AS vendoremail,
+//     v.timsheetemail,
+//     v.hrname,
+//     v.hremail,
+//     v.hrphone,
+//     v.managername,
+//     v.manageremail,
+//     v.managerphone,
+//     v.secondaryname,
+//     v.secondaryemail,
+//     v.secondaryphone,
+//     c.name AS candidatename,
+//     c.phone AS candidatephone,
+//     c.email AS candidateemail,
+//     pl.wrkemail,
+//     pl.wrkphone,
+//     r.name AS recruitername,
+//     r.phone AS recruiterphone,
+//     r.email AS recruiteremail,
+//     i.notes
+// FROM
+//     invoice i
+// JOIN
+//     po p ON i.poid = p.id
+// JOIN
+//     placement pl ON p.placementid = pl.id
+// JOIN
+//     candidate c ON pl.candidateid = c.candidateid
+// JOIN
+//     vendor v ON pl.vendorid = v.id
+// JOIN
+//     recruiter r ON pl.recruiterid = r.id
+// WHERE
+//     i.status NOT IN ('Void', 'Closed') AND
+//     DATE_ADD(i.invoicedate, INTERVAL p.invoicenet DAY) <= CURDATE()
+// ORDER BY
+//     pkid DESC
+//     `;
+
+//   // Additional query to get the total count of overdue POs
+//   const countQuery = `
+//     SELECT COUNT(*) AS totalRows
+//     FROM
+//         invoice i
+//     JOIN
+//         po p ON i.poid = p.id
+//     WHERE
+//         i.status NOT IN ('Void', 'Closed') AND
+//         DATE_ADD(i.invoicedate, INTERVAL p.invoicenet DAY) <= CURDATE()
+//     `;
+
+//   // Execute both queries
+//   db.query(countQuery, (countErr, countResult) => {
+//     if (countErr) {
+//       console.error("Database query error:", countErr);
+//       return res
+//         .status(500)
+//         .json({ message: "Database error", error: countErr.message });
+//     }
+
+//     const totalRows = countResult[0].totalRows;
+
+//     // Now fetch the data query
+//     db.query(query, (dataErr, dataResults) => {
+//       if (dataErr) {
+//         console.error("Database query error:", dataErr);
+//         return res
+//           .status(500)
+//           .json({ message: "Database error", error: dataErr.message });
+//       }
+
+//       console.log("Query results:", dataResults);
+
+//       // Return results in the format expected by the frontend
+//       return res.status(200).json({ data: dataResults, totalRows });
+//     });
+//   });
+// };
+
+    
+
+// ****---------manisai updated code -----------*********
 // Get all overdue POs
+// exports.getOverduePOs = async (req, res) => {
+//   const db = req.db;
+//   console.log("GET request received to fetch all overdue POs");
+
+//   const page = parseInt(req.query.page) || 1; // Get the current page from query params
+//   const pageSize = parseInt(req.query.pageSize) || 100; // Get the page size from query params
+//   const offset = (page - 1) * pageSize; // Calculate the offset for pagination
+
+//   // Query to retrieve all overdue POs with the specified fields
+//   const query = `
+//       SELECT
+//           i.id AS pkid, 
+//           (SELECT concat(c.name, ' - ', v.companyname, ' - ', cl.companyname)
+//            FROM candidate c
+//            JOIN placement p ON c.candidateid = p.candidateid
+//            JOIN po o ON o.placementid = p.id
+//            JOIN vendor v ON p.vendorid = v.id
+//            JOIN client cl ON p.clientid = cl.id
+//            WHERE o.id = i.poid) AS poid,
+//           i.invoicenumber,
+//           i.invoicedate,
+//           i.quantity,
+//           p.rate,
+//           DATE_ADD(i.invoicedate, INTERVAL p.invoicenet DAY) AS expecteddate,
+//           ((i.quantity * p.rate) + (i.otquantity * p.overtimerate)) AS amountexpected,
+//           i.startdate,
+//           i.enddate,
+//           i.status,
+//           i.remindertype,
+//           i.amountreceived,
+//           i.receiveddate,
+//           i.releaseddate,
+//           i.checknumber,
+//           i.invoiceurl,
+//           i.checkurl,
+//           v.companyname,
+//           v.fax AS vendorfax,
+//           v.phone AS vendorphone,
+//           v.email AS vendoremail,
+//           v.timsheetemail,
+//           v.hrname,
+//           v.hremail,
+//           v.hrphone,
+//           v.managername,
+//           v.manageremail,
+//           v.managerphone,
+//           v.secondaryname,
+//           v.secondaryemail,
+//           v.secondaryphone,
+//           c.name AS candidatename,
+//           c.phone AS candidatephone,
+//           c.email AS candidateemail,
+//           pl.wrkemail,
+//           pl.wrkphone,
+//           r.name AS recruitername,
+//           r.phone AS recruiterphone,
+//           r.email AS recruiteremail,
+//           i.notes
+//       FROM
+//           invoice i
+//       JOIN
+//           po p ON i.poid = p.id
+//       JOIN
+//           placement pl ON p.placementid = pl.id
+//       JOIN
+//           candidate c ON pl.candidateid = c.candidateid
+//       JOIN
+//           vendor v ON pl.vendorid = v.id
+//       JOIN
+//           recruiter r ON pl.recruiterid = r.id
+//       WHERE
+//           i.status NOT IN ('Void', 'Closed') AND
+//           DATE_ADD(i.invoicedate, INTERVAL p.invoicenet DAY) <= CURDATE()
+//       ORDER BY
+//           pkid DESC
+//       LIMIT ? OFFSET ?;`;
+
+//   // Additional query to get the total count of overdue POs
+//   const countQuery = `
+//       SELECT COUNT(*) AS totalRows
+//       FROM
+//           invoice i
+//       JOIN
+//           po p ON i.poid = p.id
+//       WHERE
+//           i.status NOT IN ('Void', 'Closed') AND
+//           DATE_ADD(i.invoicedate, INTERVAL p.invoicenet DAY) <= CURDATE();
+//   `;
+
+//   try {
+//       // Execute the count query
+//       const [countResult] = await db.query(countQuery);
+//       const totalRows = countResult[0].totalRows;
+
+//       // Execute the data query with pagination
+//       const [dataResults] = await db.query(query, [pageSize, offset]);
+
+//       // Return results in the format expected by the frontend
+//       return res.status(200).json({ data: dataResults, totalRows });
+//   } catch (err) {
+//       console.error("Database query error:", err);
+//       return res.status(500).json({ message: "Database error", error: err.message });
+//   }
+// };
+
+
+
 exports.getOverduePOs = (req, res) => {
   console.log("GET request received to fetch all overdue POs");
+
+  // Get pagination parameters from the request
+  const page = parseInt(req.query.page) || 1; // Default to page 1
+  const pageSize = parseInt(req.query.pageSize) || 100; // Default to 100 rows per page
+  const offset = (page - 1) * pageSize; // Calculate the offset
 
   // Query to retrieve all overdue POs with the specified fields
   const query = `
@@ -71,9 +299,9 @@ WHERE
     DATE_ADD(i.invoicedate, INTERVAL p.invoicenet DAY) <= CURDATE()
 ORDER BY
     pkid DESC
-    `;
+    LIMIT ? OFFSET ?;  `// Added LIMIT and OFFSET for pagination
 
-  // Additional query to get the total count of overdue POs
+    // Additional query to get the total count of overdue POs
   const countQuery = `
     SELECT COUNT(*) AS totalRows
     FROM
@@ -96,8 +324,8 @@ ORDER BY
 
     const totalRows = countResult[0].totalRows;
 
-    // Now fetch the data query
-    db.query(query, (dataErr, dataResults) => {
+    // Now fetch the data query with pagination
+    db.query(query, [pageSize, offset], (dataErr, dataResults) => { // Pass pageSize and offset
       if (dataErr) {
         console.error("Database query error:", dataErr);
         return res
@@ -113,6 +341,8 @@ ORDER BY
   });
 };
 
+
+// ----------------************----------------------------------------
 // Add new overdue PO
 exports.addOverduePO = async (req, res) => {
   // Similar to previous addPO logic.

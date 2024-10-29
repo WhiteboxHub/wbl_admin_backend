@@ -10,8 +10,58 @@ const db = mysql.createPool({
   database: process.env.DB_DATABASE,
 });
 
+// exports.getPOs = async (req, res) => {
+//   try {
+//     const [results] = await db.query(`
+//       SELECT
+//         po.id AS POID,
+//         CONCAT(c.name, '---', v.companyname, '---', cl.companyname) AS PlacementDetails,
+//         po.begindate AS StartDate,
+//         po.enddate AS EndDate,
+//         po.rate AS Rate,
+//         po.overtimerate AS OvertimeRate,
+//         po.freqtype AS FreqType,
+//         po.frequency AS InvoiceFrequency,
+//         po.invoicestartdate AS InvoiceStartDate,
+//         po.invoicenet AS InvoiceNet,
+//         po.polink AS POUrl,
+//         po.notes AS Notes
+//       FROM
+//         po
+//       LEFT JOIN
+//         placement pl ON po.placementid = pl.id
+//       LEFT JOIN
+//         candidate c ON pl.candidateid = c.candidateid
+//       LEFT JOIN
+//         vendor v ON pl.vendorid = v.id
+//       LEFT JOIN
+//         client cl ON pl.clientid = cl.id
+//       ORDER BY
+//         po.id DESC;
+//     `); // Using async/await
+
+//     res.json({
+//       data: results,
+//       totalRows: results.length, // Total count of rows returned
+//     });
+//   } catch (err) {
+//     console.error("Database query error:", err);
+//     res.status(500).json({ message: "Database error" });
+//   }
+// };
+
+
+// Middleware to attach the database connection to the request object
+
+
+// Add new PO
+
 exports.getPOs = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1; // Get the current page from query params
+    const pageSize = parseInt(req.query.pageSize) || 100; // Get the page size from query params
+    const offset = (page - 1) * pageSize; // Calculate the offset for pagination
+
     const [results] = await db.query(`
       SELECT
         po.id AS POID,
@@ -37,12 +87,16 @@ exports.getPOs = async (req, res) => {
       LEFT JOIN
         client cl ON pl.clientid = cl.id
       ORDER BY
-        po.id DESC;
-    `); // Using async/await
+        po.id DESC
+      LIMIT ? OFFSET ?;`, [pageSize, offset]); // Use LIMIT and OFFSET for pagination
+
+    // Get total count of rows for pagination
+    const [totalCountResult] = await db.query(`SELECT COUNT(*) AS total FROM po;`);
+    const totalRows = totalCountResult[0].total;
 
     res.json({
       data: results,
-      totalRows: results.length, // Total count of rows returned
+      totalRows: totalRows, // Total count of rows in the database
     });
   } catch (err) {
     console.error("Database query error:", err);
@@ -50,11 +104,6 @@ exports.getPOs = async (req, res) => {
   }
 };
 
-
-// Middleware to attach the database connection to the request object
-
-
-// Add new PO
 exports.addPO = async (req, res) => {
   try {
     const {
