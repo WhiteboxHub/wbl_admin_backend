@@ -11,7 +11,9 @@ const candidateRoutes = require('./routes/candidateRoutes');
 const batchRoutes = require('./routes/batchRoutes'); // Import the batchRoutes
 const accessRoutes =require('./routes/accessRoutes');
 const employeeRoutes =require('./routes/employeeRoutes');
-const candidateMarketingRoutes =require('./routes/candidateMarketingRoutes')
+const candidateMarketingRoutes =require('./routes/candidateMarketingRoutes');
+const marketingCandidatesRoutes =require('./routes/marketingCandidatesRoutes');
+// const marketingCandidatesRoutes =require('@/routes/marketingCandidatesRoutes');
 const poRoutes = require('./routes/poRoutes');
 const placementRoutes =require('./routes/placementRoutes');
 const byMonthRoutes = require('./routes/bymonthRoutes');
@@ -76,7 +78,8 @@ app.use('/api/admin', candidateRoutes);
 app.use('/api/admin', batchRoutes); // Add the batchRoutes
 app.use('/api/admin',accessRoutes);
 app.use('/api/admin',employeeRoutes);
-app.use('/api/admin',candidateMarketingRoutes)
+app.use('/api/admin',candidateMarketingRoutes);
+app.use('/api/admin',marketingCandidatesRoutes);
 app.use('/api/admin',placementRoutes);
 app.use('/api/admin',poRoutes);
 app.use('/api/admin',clientRoutes);
