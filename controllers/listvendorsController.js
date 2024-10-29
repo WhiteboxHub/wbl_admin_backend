@@ -15,6 +15,9 @@ exports.getAllVendors = async (req, res) => {
       WHERE clientid = 0
     `;
 
+'SELECT id,name,email,phone,designation,vendorid,(select ifnull(companyname, " ") from vendor where id = vendorid) comp, status,dob,personalemail,skypeid,linkedin,twitter,facebook,review,notes FROM recruiter where clientid = 0 ';
+
+
     db.query(query, (err, results) => {
       if (err) {
         console.error("Database query error:", err);

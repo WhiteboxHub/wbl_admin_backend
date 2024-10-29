@@ -21,6 +21,7 @@ const vendorRoutes = require('./routes/vendorRoutes');
 const clientRoutes = require('./routes/clientRoutes');
 const urlsRoutes = require('./routes/urlsRoutes');
 const listvendorRoutes = require('./routes/listvendorRoutes');
+const listclientRoutes = require('./routes/listclientRoutes');
 const mysql = require('mysql2');
 const pool =require('./db')
 const app = express();
@@ -85,6 +86,7 @@ app.use('/api/admin',vendorRoutes);
 app.use('/api/admin',overdueRoutes);
 app.use('/api/admin',urlsRoutes);
 app.use('/api/admin',listvendorRoutes);
+app.use('/api/admin',listclientRoutes); 
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
