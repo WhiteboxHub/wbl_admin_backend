@@ -110,6 +110,7 @@ router.delete(
 
 // Modified backend route to handle global search with pagination for candidate marketing
 router.get("/candidatemarketing/search", AdminValidationMiddleware, (req, res) => {
+  const db = req.db;
   const searchQuery = req.query.search || ""; // Get search query from params
   const page = parseInt(req.query.page, 10) || 1; // Default page = 1
   const pageSize = parseInt(req.query.pageSize, 10) || 10; // Default pageSize = 10
@@ -136,7 +137,7 @@ WHERE cm.candidateid = c.candidateid
     WHERE CONCAT_WS(' ', status, technology) LIKE ?;`; // Query to get total rows for pagination
 
   // Execute the query to get the total number of rows that match the search
-  req.db.query(totalRowsQuery, [`%${searchQuery}%`], (err, totalResults) => {
+  db.query(totalRowsQuery, [`%${searchQuery}%`], (err, totalResults) => {
     if (err) {
       console.error("Error executing totalRowsQuery:", err.stack);
       return res
@@ -147,7 +148,7 @@ WHERE cm.candidateid = c.candidateid
     const totalRows = totalResults[0].totalRows;
 
     // Execute the query to get the candidates data based on pagination and search
-    req.db.query(
+    db.query(
       getCandidatesQuery,
       [`%${searchQuery}%`, pageSize, offset],
       (error, results) => {
