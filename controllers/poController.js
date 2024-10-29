@@ -50,56 +50,9 @@ exports.getPOs = async (req, res) => {
   }
 };
 
-// Fetch PO by ID
-exports.getPOById = async (req, res) => {
-  try {
-    const { id } = req.params;
 
-    if (!id) {
-      return res.status(400).json({ error: "PO ID is required" });
-    }
+// Middleware to attach the database connection to the request object
 
-    const query = `
-      SELECT 
-        po.id AS "PO ID", 
-        CONCAT(c.name, '---', v.companyname, '---', cl.companyname) AS "Placement Details"
-        pl.id AS "Placement ID",
-        po.begindate AS "Start Date", 
-        po.enddate AS "End Date", 
-        po.rate AS "Rate", 
-        po.overtimerate AS "Overtime Rate", 
-        po.freqtype AS "Freq. Type", 
-        po.frequency AS "Invoice Frequency", 
-        po.invoicestartdate AS "Invoice Start Date", 
-        po.invoicenet AS "Invoice Net", 
-        po.polink AS "PO Url", 
-        po.notes AS "Notes", 
-      FROM 
-        po
-      LEFT JOIN 
-        placement pl ON po.placementid = pl.id
-      LEFT JOIN 
-        candidate c ON pl.candidateid = c.candidateid
-      LEFT JOIN 
-        vendor v ON pl.vendorid = v.id
-      LEFT JOIN 
-        client cl ON pl.clientid = cl.id
-      WHERE 
-        po.id = ?;  -- Use parameterized query for security
-    `;
-
-    const [result] = await db.query(query, [id]);
-
-    if (result.length === 0) {
-      return res.status(404).json({ error: "PO not found" });
-    }
-
-    res.json(result[0]); // Respond with the found purchase order details
-  } catch (error) {
-    console.error("Error fetching PO by ID:", error);
-    res.status(500).json({ error: error.message });
-  }
-};
 
 // Add new PO
 exports.addPO = async (req, res) => {
@@ -118,9 +71,9 @@ exports.addPO = async (req, res) => {
       notes,
     } = req.body;
 
-    const result = await db.query(
+    const result = await req.db.query(
       `INSERT INTO po (placementid, begindate, enddate, rate, overtimerate, freqtype, frequency, invoicestartdate, invoicenet, polink, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, // Use ? placeholders
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         placementid,
         begindate,
@@ -136,7 +89,7 @@ exports.addPO = async (req, res) => {
       ]
     );
 
-    res.status(201).json({ message: "PO created", data: result[0] }); // Respond with success
+    res.status(201).json({ message: "PO created", data: result[0] });
   } catch (error) {
     console.error("Error adding PO:", error);
     res.status(500).json({ error: error.message });
@@ -149,7 +102,7 @@ exports.updatePO = async (req, res) => {
     const { id } = req.params;
     const updateFields = {};
 
-    // Extract fields from request body and add them to updateFields object
+    if (req.body.placementid !== undefined) updateFields.placementid = req.body.placementid;
     if (req.body.begindate !== undefined) updateFields.begindate = req.body.begindate;
     if (req.body.enddate !== undefined) updateFields.enddate = req.body.enddate;
     if (req.body.rate !== undefined) updateFields.rate = req.body.rate;
@@ -161,17 +114,14 @@ exports.updatePO = async (req, res) => {
     if (req.body.polink !== undefined) updateFields.polink = req.body.polink;
     if (req.body.notes !== undefined) updateFields.notes = req.body.notes;
 
-    // Create an array of field names and values for the SQL query
     const fieldNames = Object.keys(updateFields);
     const fieldValues = Object.values(updateFields);
 
-    // Generate the SET clause for the SQL query
     const setClause = fieldNames.map(field => `${field} = ?`).join(", ");
 
-    // Add the id to the end of fieldValues array for the WHERE clause
     fieldValues.push(id);
 
-    const result = await db.query(
+    const result = await req.db.query(
       `UPDATE po SET ${setClause} WHERE id = ?`,
       fieldValues
     );
@@ -186,6 +136,72 @@ exports.updatePO = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating PO:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// View PO
+exports.viewPO = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await req.db.query(
+      `SELECT id, placementid, begindate, enddate, rate, overtimerate, freqtype, frequency, invoicestartdate, invoicenet, polink, notes
+       FROM po
+       WHERE id = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "PO not found" });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    console.error("Error viewing PO:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Delete PO
+exports.deletePO = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [result] = await req.db.query(
+      `DELETE FROM po WHERE id = ?`,
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "PO not found" });
+    }
+
+    res.json({ message: "PO deleted" });
+  } catch (error) {
+    console.error("Error deleting PO:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+// Search PO
+exports.searchPO = async (req, res) => {
+  try {
+    const { searchField, searchValue } = req.query;
+
+    if (!searchField || !searchValue) {
+      return res.status(400).json({ error: "Search field and value are required" });
+    }
+
+    const [rows] = await req.db.query(
+      `SELECT id, placementid, begindate, enddate, rate, overtimerate, freqtype, frequency, invoicestartdate, invoicenet, polink, notes
+       FROM po
+       WHERE ${searchField} LIKE ?`,
+      [`%${searchValue}%`]
+    );
+
+    res.json(rows);
+  } catch (error) {
+    console.error("Error searching PO:", error);
     res.status(500).json({ error: error.message });
   }
 };

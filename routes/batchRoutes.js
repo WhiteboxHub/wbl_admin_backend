@@ -4,7 +4,7 @@ const batchController = require('../controllers/batchController'); // Adjust the
 const AdminValidationMiddleware = require('../Middleware/AdminValidationMiddleware');
 
 // Route to get batches with pagination and search
-router.get('', AdminValidationMiddleware, (req, res) => {
+router.get('/batches', AdminValidationMiddleware, (req, res) => {
   const db = req.db;
   if (!db) {
     return res.status(500).json({ message: 'Database connection error' });
@@ -100,7 +100,7 @@ router.get('/batches', AdminValidationMiddleware, (req, res) => {
   
 
 // Route to insert a new batch
-router.post('/insert', (req, res) => {
+router.post('/batches/insert', (req, res) => {
   const newBatch = req.body;
 
   // Insert the new batch
@@ -114,13 +114,13 @@ router.post('/insert', (req, res) => {
 });
 
 // Route to update an existing batch
-router.put('/update/:id', AdminValidationMiddleware, batchController.updateBatch);
+router.put('/batches/update/:id', AdminValidationMiddleware, batchController.updateBatch);
 
 // Route to insert a new batch using the batchController
 router.put('batches/insert', AdminValidationMiddleware, batchController.insertBatch);
 
 // Route to delete a batch
-router.delete('/delete/:id', AdminValidationMiddleware, batchController.deleteBatch);
+router.delete('/batches/delete/:id', AdminValidationMiddleware, batchController.deleteBatch);
 
 
 
