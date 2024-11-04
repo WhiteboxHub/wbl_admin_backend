@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const AdminValidationMiddleware = require('../middleware/AdminValidationMiddleware');
+const AdminValidationMiddleware = require('../Middleware/AdminValidationMiddleware');
 const bymonthController = require('../controllers/bymonthController');
 
 // Get all POs by month
