@@ -224,7 +224,7 @@ router.get('/batches', AdminValidationMiddleware, (req, res) => {
       }
 
       const totalRows = countResults[0].total;
-      res.json({ data: results, totalRows });
+      res.json({ data, totalRows });
     });
   });
 });
