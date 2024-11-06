@@ -1,7 +1,7 @@
 
 
 const mysql = require("mysql2/promise"); // Use promise-based mysql2
-
+// const pool=require('../db')
 // Connect to the database
 const db = mysql.createPool({
   host: process.env.DB_HOST,
@@ -12,11 +12,13 @@ const db = mysql.createPool({
 
 
 exports.getPOs = async (req, res) => {
+  // const db = req.db;
+  // console.log(db);
+  
   try {
     const page = parseInt(req.query.page) || 1; // Get the current page from query params
     const pageSize = parseInt(req.query.pageSize) || 100; // Get the page size from query params
     const offset = (page - 1) * pageSize; // Calculate the offset for pagination
-
     const [results] = await db.query(`
       SELECT
         po.id AS POID,
