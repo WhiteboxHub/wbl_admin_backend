@@ -26,6 +26,7 @@ const listvendorRoutes = require('./routes/listvendorRoutes');
 const detialedvendorRoutes = require('./routes/detailedvendorRoutes');
 const listclientRoutes = require('./routes/listclientRoutes');
 const detialedclientRoutes = require('./routes/detailedclientRoutes');
+const searchRoutes = require('./routes/searchRoutes');
 const mysql = require('mysql2');
 const pool =require('./db')
 const app = express();
@@ -90,6 +91,7 @@ app.use('/api/admin',byPoRoutes);
 app.use('/api/admin',vendorRoutes);
 app.use('/api/admin',overdueRoutes);
 app.use('/api/admin',urlsRoutes);
+app.use('/api/admin',searchRoutes);
 app.use('/api/admin',listvendorRoutes);
 app.use('/api/admin',listclientRoutes); 
 app.use('/api/admin',detialedvendorRoutes); 

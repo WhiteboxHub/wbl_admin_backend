@@ -6,7 +6,9 @@ const jwt_secret = process.env.SECRET_KEY;
 const AdminValidation = async(req,res,next)=>{
 
     const authHeader = req.header('AuthToken'); // Get token from headers
-//   const token = authHeader && authHeader.split(' ')[1]; // Extract token from "Bearer <token>"
+    console.log(authHeader);
+    
+//  const token = authHeader && authHeader.split(' ')[1]; // Extract token from "Bearer <token>"
   if (!authHeader) {
     return res.status(401).json({ message: 'Token not provided' });
   }
