@@ -172,9 +172,6 @@
 
 
 
-// //2012-04	N	2012-04-08	QA	2012-04-08	2012-06-15	3	1	3		Testing Fundamentals, Web Concepts, JMeter,  Selenium RC/ webdriver, Load Runner, QC, QTP,SQL	Mobile Testing		27	1
-
-
 
 const express = require('express');
 const router = express.Router();
@@ -346,8 +343,3 @@ router.get("/batches/search", AdminValidationMiddleware, (req, res) => {
 });
 
 module.exports = router;
-
-
-
-
-//2012-04	N	2012-04-08	QA	2012-04-08	2012-06-15	3	1	3		Testing Fundamentals, Web Concepts, JMeter,  Selenium RC/ webdriver, Load Runner, QC, QTP,SQL	Mobile Testing		27	1
