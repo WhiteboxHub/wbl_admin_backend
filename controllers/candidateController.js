@@ -127,24 +127,27 @@ const deleteCandidate = async (req, res) => {
   }
 
   try {
-    // const db = req.db; // Assuming `req.db` contains the database connection
+    // Assuming `db` is a promise-based MySQL connection
     if (!db) {
       return res.status(500).json({ message: 'Database connection is missing' });
     }
 
     // Check for related records in the candidatemarketing table
     const marketingResults = await db.promise().query('SELECT * FROM candidatemarketing WHERE candidateid = ?', [candidateId]);
-    if (marketingResults[0].length > 0) {
+    console.log('Marketing Results:', marketingResults); // Debugging step
+    if (marketingResults && marketingResults[0] && marketingResults[0].length > 0) {
       // Delete related records in the candidatemarketing table
       await db.promise().query('DELETE FROM candidatemarketing WHERE candidateid = ?', [candidateId]);
     }
 
     // Delete the candidate record
-    const [candidateResults] = db.query('DELETE FROM candidate WHERE candidateid = ?', [candidateId]);
+    const candidateResults = await db.promise().query('DELETE FROM candidate WHERE candidateid = ?', [candidateId]);
+    console.log('Candidate Results:', candidateResults); // Debugging step
 
     if (candidateResults.affectedRows === 0) {
       return res.status(404).json({ message: 'Candidate not found' });
-    }
+   }
+   
 
     res.status(200).json({ message: 'Candidate deleted successfully' });
   } catch (err) {
@@ -154,6 +157,7 @@ const deleteCandidate = async (req, res) => {
 };
 
 module.exports = { deleteCandidate };
+
 
 
 
