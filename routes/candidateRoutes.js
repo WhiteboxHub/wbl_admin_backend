@@ -71,8 +71,8 @@ router.post('/candidates/insert', (req, res) => {
   // Insert the new candidate
   req.db.query('INSERT INTO candidate SET ?', newCandidate, (err, results) => {
     if (err) {
-      console.error('Database insert error:', err);
-      return res.status(500).json({ message: 'Database error' });
+      console.error('Database update error:', err);
+      return res.status(500).json({ message: 'Database error', error: err });
     }
     res.status(201).json({ id: results.insertId, ...newCandidate });
   });
@@ -84,8 +84,7 @@ router.put('/candidates/update/:id', AdminValidationMiddleware, candidateControl
 // Route to insert a new candidate using the candidateController
 router.put('/candidates/insert', AdminValidationMiddleware, candidateController.insertCandidate);
 
-router.delete('/candidates/delete/:name', AdminValidationMiddleware, candidateController.deleteCandidate);
-
+router.delete('/candidates/delete/:id', AdminValidationMiddleware, candidateController.deleteCandidate);
 // Modified backend route to handle global search with pagination
 router.get("/candidates/search", AdminValidationMiddleware, (req, res) => {
   const searchQuery = req.query.search || ''; // Get search query from params

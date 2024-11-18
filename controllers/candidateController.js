@@ -1,12 +1,12 @@
 const mysql = require('mysql2');
 const pool = require('../db')
 // // Connect to the database
-// const db = mysql.createConnection({
-//   host: process.env.DB_HOST,
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASSWORD,
-//   database: process.env.DB_DATABASE
-// });
+const db = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE
+});
 
 
 const getCandidates = (req, res) => {
@@ -14,7 +14,7 @@ const getCandidates = (req, res) => {
     SELECT 
       name, email, phone, course, batchname, enrolleddate, status, diceflag, 
       education, workstatus, dob, portalid, agreement, driverslicense, 
-      workpermit, wpexpirationdate, offerletterurl, ssnvalidated, address, 
+      workpermit, wpexpirationdate, offerletterurl, ssnvalidated, address, a
       city, state, country, zip, emergcontactname, emergcontactemail, 
       emergcontactphone, emergcontactaddrs, guidelines, term, referralid, 
       salary0, salary6, salary12, originalresume, notes 
@@ -48,6 +48,7 @@ const updateCandidate = (req, res) => {
   const candidateId = req.params.id;
   const updatedCandidate = req.body;
   console.log('PUT request received for ID:', candidateId);
+  console.log('Update data:', updatedCandidate);
 
   // Ensure candidateId and updatedCandidate are present
   if (!candidateId || !updatedCandidate) {
@@ -91,31 +92,70 @@ const updateCandidate = (req, res) => {
 };
 // // Update a candidate
 // -----------------**************************-------------------
-// Delete a batch
-const deleteCandidate = (req, res) => {
-  const batchId = req.params.name;
+// // Delete a batch
+// const deleteCandidate = (req, res) => {
+//   const batchId = req.params.name;
 
-  // Ensure batchId is provided
-  if (!batchId) {
-      return res.status(400).json({ message: 'Candidate ID is required' });
+//   // Ensure batchId is provided
+//   if (!batchId) {
+//       return res.status(400).json({ message: 'Candidate ID is required' });
+//   }
+
+//   // Perform the delete operation
+//   pool.query('DELETE FROM candidate WHERE name = ?', [batchId], (err, results) => {
+//       if (err) {
+//           console.error('Database delete error:', err);
+//           return res.status(500).json({ message: 'Database error' });
+//       }
+
+//       // Check if any row was affected
+//       if (results.affectedRows === 0) {
+//           return res.status(404).json({ message: 'Candidate not found' });
+//       }
+
+//       // Respond with a success message
+//       res.status(200).json({ message: 'candidate deleted successfully' });
+//   });
+// };
+
+
+const deleteCandidate = async (req, res) => {
+  const candidateId = req.params.id;
+
+  if (!candidateId) {
+    return res.status(400).json({ message: 'Candidate ID is required' });
   }
 
-  // Perform the delete operation
-  pool.query('DELETE FROM candidate WHERE name = ?', [batchId], (err, results) => {
-      if (err) {
-          console.error('Database delete error:', err);
-          return res.status(500).json({ message: 'Database error' });
-      }
+  try {
+    // const db = req.db; // Assuming `req.db` contains the database connection
+    if (!db) {
+      return res.status(500).json({ message: 'Database connection is missing' });
+    }
 
-      // Check if any row was affected
-      if (results.affectedRows === 0) {
-          return res.status(404).json({ message: 'Candidate not found' });
-      }
+    // Check for related records in the candidatemarketing table
+    const marketingResults = await db.promise().query('SELECT * FROM candidatemarketing WHERE candidateid = ?', [candidateId]);
+    if (marketingResults[0].length > 0) {
+      // Delete related records in the candidatemarketing table
+      await db.promise().query('DELETE FROM candidatemarketing WHERE candidateid = ?', [candidateId]);
+    }
 
-      // Respond with a success message
-      res.status(200).json({ message: 'candidate deleted successfully' });
-  });
+    // Delete the candidate record
+    const [candidateResults] = db.query('DELETE FROM candidate WHERE candidateid = ?', [candidateId]);
+
+    if (candidateResults.affectedRows === 0) {
+      return res.status(404).json({ message: 'Candidate not found' });
+    }
+
+    res.status(200).json({ message: 'Candidate deleted successfully' });
+  } catch (err) {
+    console.error('Database delete error:', err);
+    res.status(500).json({ message: 'Database error', error: err.message });
+  }
 };
+
+module.exports = { deleteCandidate };
+
+
 
 
 
