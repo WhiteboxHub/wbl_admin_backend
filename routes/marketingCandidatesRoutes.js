@@ -118,10 +118,11 @@ FROM candidatemarketing cm, candidate c
 WHERE cm.candidateid = c.candidateid order by startdate desc  `;
  // Apply LIMIT and OFFSET for pagination
 
-  const totalRowsQuery = `
-    SELECT COUNT(*) as totalRows FROM candidatemarketing
-    WHERE CONCAT_WS(' ', status, technology) LIKE ?;`; // Query to get total rows for pagination
-
+ const totalRowsQuery = `
+ SELECT COUNT(*) as totalRows FROM candidatemarketing cm
+ JOIN candidate c ON cm.candidateid = c.candidateid
+ WHERE CONCAT_WS(' ', c.name, c.email, c.phone, cm.technology, cm.status) LIKE ?;
+`;
   // Execute the query to get the total number of rows that match the search
   db.query(totalRowsQuery, [`%${searchQuery}%`], (err, totalResults) => {
     if (err) {

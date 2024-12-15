@@ -7,7 +7,7 @@
       priority, technology, minrate, currentlocation, relocation, locationpreference, 
       skypeid, ipemailid, resumeid, coverletter, intro, closedate, closedemail, 
       notes, suspensionreason, yearsofexperience 
-      FROM candidatemarketing ORDER BY startdate DESC`, 
+      FROM candidatemarketing ORDER BY id DESC`, 
     (err, results) => {
       if (err) {
         console.error('Database query error:', err);
@@ -31,25 +31,57 @@
   //   });
   // };
 
-  // Update a candidate in the candidate marketing table
+  // // Update a candidate in the candidate marketing table
+  // const updateCandidate = (req, res) => {
+  //   const candidateId = req.params.id;
+  //   const updatedCandidate = req.body;
+
+  //   // Ensure candidateId and updatedCandidate are present
+  //   if (!candidateId || !updatedCandidate) {
+  //     return res.status(400).json({ message: 'Candidate ID and data are required' });
+  //   }
+
+  //   // Update the candidate
+  //   pool.query('UPDATE candidatemarketing SET ? WHERE id = ?', [updatedCandidate, candidateId], (err, results) => {
+  //     if (err) {
+  //       console.error('Database update error:', err);
+  //       return res.status(500).json({ message: 'Database error' });
+  //     }
+  //     res.status(200).json({ id: candidateId, ...updatedCandidate });
+  //   });
+  // };
+
+
   const updateCandidate = (req, res) => {
-    const candidateId = req.params.id;
-    const updatedCandidate = req.body;
-
-    // Ensure candidateId and updatedCandidate are present
-    if (!candidateId || !updatedCandidate) {
-      return res.status(400).json({ message: 'Candidate ID and data are required' });
+    const db = req.db;
+    const id = req.params.id;
+    const { startdate, mmid, instructorid, status, submitterid, priority, technology, minrate, ipemailid, currentlocation, locationpreference, relocation, skypeid, resumeid, intro, closedate, suspensionreason, notes, yearsofexperience } = req.body;
+  
+    if (!db) {
+      return res.status(500).json({ message: "Database connection error" });
     }
-
-    // Update the candidate
-    pool.query('UPDATE candidatemarketing SET ? WHERE id = ?', [updatedCandidate, candidateId], (err, results) => {
+  
+    const query = `
+      UPDATE candidatemarketing
+      SET startdate = ?, mmid = ?, instructorid = ?, status = ?, submitterid = ?, priority = ?, technology = ?, minrate = ?, ipemailid = ?, 
+      currentlocation = ?, locationpreference = ?, relocation = ?, skypeid = ?, resumeid = ?, intro = ?, closedate = ?, suspensionreason = ?,
+      notes = ?, yearsofexperience = ? WHERE id = ?
+    `;
+  
+    const values = [startdate, mmid, instructorid, status, submitterid, priority, technology, minrate, ipemailid, currentlocation, locationpreference, relocation, skypeid, resumeid, intro, closedate, suspensionreason, notes, yearsofexperience, id];
+  
+    db.query(query, values, (err, results) => {
       if (err) {
-        console.error('Database update error:', err);
-        return res.status(500).json({ message: 'Database error' });
+        console.error("Database update error:", err);
+        return res.status(500).json({ message: "Database error", error: err.message });
       }
-      res.status(200).json({ id: candidateId, ...updatedCandidate });
+      res.status(200).json({ message: "Candidate marketing entry updated successfully", results });
     });
   };
+
+
+
+
 
   // Delete a candidate from the candidate marketing table
   const deleteCandidate = (req, res) => {

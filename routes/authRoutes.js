@@ -4,7 +4,6 @@ const { login, getLeads } = require('../controllers/userController'); // Ensure 
 const router = express.Router();
 
 router.post('/login', login);
-// router.get('/leads', getLeads); // This should correctly reference the function
+router.get('/leads', getLeads); // This should correctly reference the function
 
 module.exports = router;
-
