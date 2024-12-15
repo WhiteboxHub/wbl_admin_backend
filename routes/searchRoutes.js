@@ -8,4 +8,6 @@ const AdminValidationMiddleware = require('../Middleware/AdminValidationMiddlewa
 // Route to search candidates by name
 router.get('/searchByName', AdminValidationMiddleware, searchController.searchCandidatesByName);
 
+
+
 module.exports = router;

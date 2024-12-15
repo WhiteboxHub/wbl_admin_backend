@@ -62,7 +62,7 @@ const login = (req, res) => {
     console.log('User details:', user);
     
     // Check if the user is part of the 'admin' team
-    if (user.team !== 'admin') {
+    if (user.team == 'admin') {
       return res.status(403).json({ message: 'Access denied: Admins only' });
     }
     
@@ -70,6 +70,8 @@ const login = (req, res) => {
     if (password === user.passwd) {
       // Create a JWT
       const token = jwt.sign({ id: user.id, username: user.uname }, SECRET_KEY, { expiresIn: '1h' });
+      console.log(token);
+      
       
       return res.json({ token, message: `Welcome back, ${user.uname}!` });
     } else {

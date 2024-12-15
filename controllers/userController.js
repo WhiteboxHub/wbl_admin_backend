@@ -29,11 +29,17 @@ const login = (req, res) => {
     }
 
     const user = results[0];
-    console.log(user)
+    // console.log(user)
     // Hash the plaintext password and compare with the hashed password in the database
     if (hashPassword(password) === user.passwd) {
       // Create a JWT
-      if(user.team === 'Admin'){
+      
+      // const token = jwt.sign({ id: user.id, username: user.uname }, SECRET_KEY, { expiresIn: '1h' });
+
+      // return res.json({ token, message: `Welcome back, ${user.uname}!` });
+      // console.log(user.team);
+      
+      if(user.team =='admin'){
       const token = jwt.sign({ id: user.id, username: user.uname }, SECRET_KEY, { expiresIn: '1h' });
 
       return res.json({ token, message: `Welcome back, ${user.uname}!` });

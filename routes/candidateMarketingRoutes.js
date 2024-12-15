@@ -95,18 +95,10 @@ router.get("/candidatemarketing", AdminValidationMiddleware, (req, res) => {
 // });
 
 // Route to update an existing candidate marketing entry
-router.put(
-  "/candidatemarketing/update/:id",
-  AdminValidationMiddleware,
-  candidateMarketingController.updateCandidate
-);
+router.put("/candidatemarketing/update/:id",AdminValidationMiddleware,candidateMarketingController.updateCandidate);
 
 // Route to delete a candidate marketing entry
-router.delete(
-  "/candidatemarketing/delete/:id",
-  AdminValidationMiddleware,
-  candidateMarketingController.deleteCandidate
-);
+router.delete("/candidatemarketing/delete/:id",AdminValidationMiddleware,candidateMarketingController.deleteCandidate);
 
 // Modified backend route to handle global search with pagination for candidate marketing
 router.get("/candidatemarketing/search", AdminValidationMiddleware, (req, res) => {
@@ -125,16 +117,16 @@ router.get("/candidatemarketing/search", AdminValidationMiddleware, (req, res) =
        (SELECT link FROM resume WHERE id = cm.resumeid) AS resumelink, 
        (SELECT phone FROM ipemail WHERE id = ipemailid) AS ipphone, 
        cm.closedate, cm.suspensionreason, cm.intro, cm.notes 
-FROM candidatemarketing cm, candidate c 
-WHERE cm.candidateid = c.candidateid 
-  AND c.status IN ("Marketing", "Placed", "OnProject-Mkt") 
-  AND cm.status NOT IN ("6-Suspended", "5-Closed")
-  `; 
+        FROM candidatemarketing cm, candidate c 
+        WHERE cm.candidateid = c.candidateid 
+          AND c.status IN ("Marketing", "Placed", "OnProject-Mkt") 
+          AND cm.status NOT IN ("6-Suspended", "5-Closed")
+          `; 
  // Apply LIMIT and OFFSET for pagination
 
   const totalRowsQuery = `
     SELECT COUNT(*) as totalRows FROM candidatemarketing
-    WHERE CONCAT_WS(' ', status, technology) LIKE ?;`; // Query to get total rows for pagination
+    WHERE CONCAT_WS(' ', status, technology) LIKE ?;` ; // Query to get total rows for pagination
 
   // Execute the query to get the total number of rows that match the search
   db.query(totalRowsQuery, [`%${searchQuery}%`], (err, totalResults) => {
